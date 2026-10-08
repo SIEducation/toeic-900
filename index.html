@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<meta name="theme-color" content="#0f172a">
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="apple-touch-icon" href="./icons/icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="TOEIC 900">
+<title>TOEIC 900 Vocabulary</title>
+<link rel="stylesheet" href="./style.css">
+</head>
+<body>
+<div class="app" id="app">
+  <header class="topbar">
+    <div><div class="eyebrow">TOEIC 825 → 900</div><h1 id="headerTitle">Vocabulary</h1></div>
+    <div class="top-actions">
+      <button class="iconbtn" id="installBtn" title="安裝 App" style="display:none">⇩</button>
+      <button class="iconbtn" id="statsBtn" title="統計">◎</button>
+      <button class="iconbtn" id="themeBtn" title="深色模式">◐</button>
+    </div>
+  </header>
+  <main>
+    <section id="screen-home" class="screen active"></section>
+    <section id="screen-decks" class="screen"></section>
+    <section id="screen-review" class="screen"></section>
+    <section id="screen-search" class="screen"></section>
+    <section id="screen-settings" class="screen"></section>
+    <section id="screen-deck" class="screen"></section>
+    <section id="screen-flash" class="screen"></section>
+    <section id="screen-match" class="screen"></section>
+    <section id="screen-quiz" class="screen"></section>
+    <section id="screen-cloze" class="screen"></section>
+    <section id="screen-stats" class="screen"></section>
+  </main>
+</div>
+<nav class="bottomnav"><div class="inner" id="nav">
+  <button data-nav="home" class="active"><b>⌂</b>首頁</button>
+  <button data-nav="decks"><b>▦</b>單字夾</button>
+  <button data-nav="review"><b>↻</b>複習</button>
+  <button data-nav="search"><b>⌕</b>搜尋</button>
+  <button data-nav="settings"><b>⚙</b>設定</button>
+</div></nav>
+
+<div id="modal" class="modal hidden"><div class="modalcard"><div class="modalhead"><div id="modalTitle"></div><button class="close" id="modalClose">×</button></div><div id="modalBody"></div></div></div>
+<div id="toast" class="toast hidden"></div>
+<input type="file" id="importProgress" accept="application/json" hidden>
+<input type="file" id="importDataset" accept=".json,application/json" hidden>
+
+<script src="./app.js"></script>
+</body>
+</html>

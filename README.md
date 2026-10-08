@@ -47,3 +47,7 @@ Service Worker 會快取 App 外殼；字庫資料仍由 App 的 IndexedDB 保�
 - Mobile: bottom navigation, touch-first single-column UI.
 - Desktop (>=900px): fixed left sidebar, wide workspace, 4–5 column deck library, centered flashcards/quizzes, 4-column matching game.
 - One URL automatically adapts to phone, tablet, and desktop.
+
+
+## v5.1
+Icons are stored in the repository root for simpler GitHub web upload.

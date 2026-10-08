@@ -1,4 +1,4 @@
-# TOEIC 900 Vocabulary — PWA STRICT v5
+# TOEIC 900 Vocabulary — Master 1200 v6
 
 這是可安裝的 PWA 版本，專為 TOEIC 825 → 900 設計。
 
@@ -40,7 +40,7 @@ PWA 安裝需要以 HTTPS 網址開啟（localhost 例外）。
 Safari → 分享 → 加入主畫面。
 
 ## 離線
-Service Worker 會快取 App 外殼；字庫資料仍由 App 的 IndexedDB 保存。
+Service Worker 會快取 App 外殼；Master 1200 的完整詞條資料首次載入後會由 App 的 IndexedDB 快取；固定 1,200 字白名單已寫入程式。
 
 
 ## Responsive desktop layout
@@ -55,3 +55,13 @@ Icons are stored in the repository root for simpler GitHub web upload.
 
 ## v5.2
 Desktop header/sidebar branding layout fixed. The sidebar brand no longer overlaps the page header.
+
+## v6 — Master 1200
+- 固定 1,200 字白名單，24 Parts × 50。
+- 不再依資料集更新重新決定單字集合。
+- 排除明顯基礎字與低效益/重複詞形。
+- 單字列表、翻卡與詳細頁都支援英文語音播放。
+- 例句可獨立播放；設定頁可調語速。
+- 新快取資料庫，不會讀回舊版動態字庫。
+
+- 600–780 少量保留詞會標示為「高價值橋接」，不與 780–900 核心混在一起。

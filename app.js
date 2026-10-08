@@ -1,13 +1,14 @@
 "use strict";
 const BUILTIN = [{"id":"adv_01","word":"acquisition","pos":"n.","zh":"收購；取得","example":"The acquisition is expected to strengthen the company's position in Asia.","exampleZh":"這項收購預計將強化公司在亞洲的市場地位。","collocation":"corporate acquisition / acquire a company","star":4,"category":"營運管理","score":"780-900","forms":["acquisition"],"tips":["acquisition 常和 merger 並列出現在商業新聞、公告與 Part 7。","注意 acquire 是動詞，acquisition 是名詞。"],"tier":"825→900 核心缺口"},{"id":"adv_02","word":"adjacent","pos":"adj.","zh":"鄰近的；毗鄰的","example":"The new conference center is adjacent to the main office building.","exampleZh":"新的會議中心緊鄰總辦公大樓。","collocation":"adjacent to","star":4,"category":"物業與不動產","score":"780-900","forms":["adjacent"],"tips":["adjacent to = next to，但正式程度更高，常見於場所位置題。"],"tier":"825→900 核心缺口"},{"id":"adv_03","word":"adverse","pos":"adj.","zh":"不利的；負面的","example":"Adverse weather conditions may delay the shipment.","exampleZh":"惡劣天候可能導致貨運延誤。","collocation":"adverse effect / adverse conditions","star":4,"category":"一般專業","score":"780-900","forms":["adverse"],"tips":["adverse 常修飾 effect、impact、conditions。"],"tier":"825→900 核心缺口"},{"id":"adv_04","word":"alleviate","pos":"v.","zh":"減輕；緩和","example":"The new scheduling system should alleviate congestion at the loading dock.","exampleZh":"新的排程系統應能緩解裝卸區的壅塞。","collocation":"alleviate a problem / alleviate pressure","star":3,"category":"營運管理","score":"900+","forms":["alleviate"],"tips":["alleviate = make a problem less severe，閱讀題常以 ease / reduce 改寫。"],"tier":"900+ 拉分字"},{"id":"adv_05","word":"amend","pos":"v.","zh":"修訂；修改","example":"Both parties agreed to amend several provisions of the contract.","exampleZh":"雙方同意修訂合約中的數項條款。","collocation":"amend a contract / amend the terms","star":4,"category":"法務合規與安全","score":"780-900","forms":["amend"],"tips":["amend 常見於 contract、agreement、policy。名詞 amendment。"],"tier":"825→900 核心缺口"},{"id":"adv_06","word":"anticipate","pos":"v.","zh":"預期；預料","example":"Management anticipates a significant increase in demand next quarter.","exampleZh":"管理階層預期下季需求將顯著增加。","collocation":"anticipate demand / anticipate that...","star":4,"category":"營運管理","score":"780-900","forms":["anticipate"],"tips":["anticipate 後可接名詞、V-ing 或 that 子句。"],"tier":"825→900 核心缺口"},{"id":"adv_07","word":"applicable","pos":"adj.","zh":"適用的；可應用的","example":"Applicants must comply with all applicable regulations.","exampleZh":"申請人必須遵守所有適用的規定。","collocation":"applicable law / where applicable","star":4,"category":"法務合規與安全","score":"780-900","forms":["applicable"],"tips":["where applicable = 視情況適用，Part 7 條款常見。"],"tier":"825→900 核心缺口"},{"id":"adv_08","word":"ascertain","pos":"v.","zh":"查明；確定","example":"The technician inspected the device to ascertain the cause of the malfunction.","exampleZh":"技術人員檢查設備以查明故障原因。","collocation":"ascertain whether / ascertain the cause","star":3,"category":"一般專業","score":"900+","forms":["ascertain"],"tips":["ascertain 比 determine / find out 更正式。"],"tier":"900+ 拉分字"},{"id":"adv_09","word":"authorize","pos":"v.","zh":"授權；批准","example":"Only department heads are authorized to approve purchases over $5,000.","exampleZh":"只有部門主管獲授權批准超過五千美元的採購。","collocation":"authorize payment / be authorized to","star":4,"category":"法務合規與安全","score":"780-900","forms":["authorize"],"tips":["authorize + 人 + to V；authorized personnel 也是常見搭配。"],"tier":"825→900 核心缺口"},{"id":"adv_10","word":"commence","pos":"v.","zh":"開始；著手","example":"Renovation work will commence after the holiday weekend.","exampleZh":"整修工程將在連假後開始。","collocation":"commence operations / commence on","star":3,"category":"一般專業","score":"900+","forms":["commence"],"tips":["commence 是 begin 的正式替換字，公告與合約常見。"],"tier":"900+ 拉分字"},{"id":"adv_11","word":"comply","pos":"v.","zh":"遵守；依從","example":"Suppliers must comply with the company's safety standards.","exampleZh":"供應商必須遵守公司的安全標準。","collocation":"comply with regulations","star":4,"category":"法務合規與安全","score":"780-900","forms":["comply"],"tips":["固定搭配 comply with，不用 comply to。名詞 compliance。"],"tier":"825→900 核心缺口"},{"id":"adv_12","word":"concession","pos":"n.","zh":"讓步；特許權；優惠","example":"The supplier offered a price concession during the final negotiation.","exampleZh":"供應商在最後談判時提出價格讓步。","collocation":"make a concession / price concession","star":3,"category":"商務溝通","score":"900+","forms":["concession"],"tips":["談判情境中 concession 常指一方為促成協議而讓步。"],"tier":"900+ 拉分字"},{"id":"adv_14","word":"contingency","pos":"n.","zh":"突發狀況；應變事項","example":"The team prepared a contingency plan in case the venue became unavailable.","exampleZh":"團隊準備了應變計畫，以防場地無法使用。","collocation":"contingency plan / contingency fund","star":3,"category":"營運管理","score":"900+","forms":["contingency"],"tips":["contingency plan 是 TOEIC 商務閱讀很值得直接記的搭配。"],"tier":"900+ 拉分字"},{"id":"adv_15","word":"deteriorate","pos":"v.","zh":"惡化；衰退","example":"The equipment's condition deteriorated after years of heavy use.","exampleZh":"設備在多年高強度使用後狀況惡化。","collocation":"conditions deteriorate / deteriorating performance","star":3,"category":"一般專業","score":"900+","forms":["deteriorate"],"tips":["deteriorate 是 worsen 的正式字，常描述狀況、品質、關係。"],"tier":"900+ 拉分字"},{"id":"adv_16","word":"discrepancy","pos":"n.","zh":"差異；不一致","example":"The auditor noticed a discrepancy between the invoice and the purchase order.","exampleZh":"稽核人員發現發票與採購單之間有不一致。","collocation":"a discrepancy between / accounting discrepancy","star":4,"category":"金融與會計","score":"780-900","forms":["discrepancy"],"tips":["discrepancy 常出現在帳務、數量、紀錄不符的情境。"],"tier":"825→900 核心缺口"},{"id":"adv_17","word":"disclose","pos":"v.","zh":"揭露；透露","example":"Employees may not disclose confidential information to outside parties.","exampleZh":"員工不得向外部人士揭露機密資訊。","collocation":"disclose information / disclose details","star":4,"category":"法務合規與安全","score":"780-900","forms":["disclose"],"tips":["disclosure 是名詞；常與 confidential information 搭配。"],"tier":"825→900 核心缺口"},{"id":"adv_18","word":"entail","pos":"v.","zh":"牽涉；需要；導致","example":"Expanding the warehouse will entail substantial additional costs.","exampleZh":"擴建倉庫將需要相當可觀的額外成本。","collocation":"entail additional costs / entail doing","star":3,"category":"一般專業","score":"900+","forms":["entail"],"tips":["entail = involve as a necessary consequence，後面可接名詞或 V-ing。"],"tier":"900+ 拉分字"},{"id":"adv_19","word":"expedite","pos":"v.","zh":"加速；促進","example":"We paid an additional fee to expedite delivery of the replacement parts.","exampleZh":"我們支付額外費用以加速替換零件的配送。","collocation":"expedite delivery / expedite the process","star":3,"category":"採購與物流","score":"900+","forms":["expedite"],"tips":["expedite 常見於 delivery、shipment、process。"],"tier":"900+ 拉分字"},{"id":"adv_20","word":"feasible","pos":"adj.","zh":"可行的；行得通的","example":"The committee will determine whether the proposed schedule is feasible.","exampleZh":"委員會將判斷提議的時程是否可行。","collocation":"financially feasible / feasible option","star":4,"category":"營運管理","score":"780-900","forms":["feasible"],"tips":["feasible 著重實際可執行；possible 只表示可能。名詞 feasibility。"],"tier":"825→900 核心缺口"},{"id":"adv_21","word":"fluctuate","pos":"v.","zh":"波動；起伏","example":"Fuel prices tend to fluctuate throughout the year.","exampleZh":"燃料價格全年往往會有所波動。","collocation":"prices fluctuate / fluctuate considerably","star":4,"category":"金融與會計","score":"780-900","forms":["fluctuate"],"tips":["fluctuation 是名詞，圖表與市場資訊常見。"],"tier":"825→900 核心缺口"},{"id":"adv_22","word":"forthcoming","pos":"adj.","zh":"即將到來的；即將公布的","example":"Further details will be announced in the forthcoming report.","exampleZh":"更多細節將在即將發布的報告中公布。","collocation":"forthcoming meeting / forthcoming report","star":3,"category":"商務溝通","score":"900+","forms":["forthcoming"],"tips":["forthcoming 在公告、報告中相當常見，不等同於 '坦率的' 所有情境。"],"tier":"900+ 拉分字"},{"id":"adv_23","word":"implement","pos":"v.","zh":"實施；執行","example":"The company will implement the new policy at the beginning of next month.","exampleZh":"公司將於下月初實施新政策。","collocation":"implement a policy / implement changes","star":4,"category":"營運管理","score":"780-900","forms":["implement"],"tips":["implementation 是名詞；政策、系統、措施常搭 implement。"],"tier":"825→900 核心缺口"},{"id":"adv_24","word":"incentive","pos":"n.","zh":"誘因；獎勵措施","example":"The company introduced an incentive program to improve sales performance.","exampleZh":"公司推出獎勵計畫以提升銷售績效。","collocation":"financial incentive / incentive program","star":4,"category":"人力資源","score":"780-900","forms":["incentive"],"tips":["incentive 常和 bonus、program、encourage 形成同義語境。"],"tier":"825→900 核心缺口"},{"id":"adv_25","word":"incur","pos":"v.","zh":"招致；產生（費用、債務等）","example":"Late cancellations may incur an additional service charge.","exampleZh":"逾期取消可能會產生額外服務費。","collocation":"incur costs / incur a penalty","star":3,"category":"金融與會計","score":"900+","forms":["incur"],"tips":["incur 後面多接 cost、expense、debt、penalty、loss 等負擔。"],"tier":"900+ 拉分字"},{"id":"adv_26","word":"indispensable","pos":"adj.","zh":"不可或缺的","example":"Accurate inventory data is indispensable to efficient warehouse management.","exampleZh":"準確的庫存資料對高效率的倉儲管理不可或缺。","collocation":"indispensable to / indispensable tool","star":3,"category":"一般專業","score":"900+","forms":["indispensable"],"tips":["indispensable = essential / absolutely necessary。"],"tier":"900+ 拉分字"},{"id":"adv_27","word":"initiate","pos":"v.","zh":"啟動；開始；發起","example":"The finance department initiated a review of travel expenses.","exampleZh":"財務部門啟動了差旅費用的檢討。","collocation":"initiate a process / initiate contact","star":4,"category":"營運管理","score":"780-900","forms":["initiate"],"tips":["initiate 比 start 正式，名詞 initiation。"],"tier":"825→900 核心缺口"},{"id":"adv_28","word":"liaison","pos":"n.","zh":"聯絡；聯絡人","example":"Ms. Chen will serve as the liaison between the vendor and our design team.","exampleZh":"陳小姐將擔任供應商與設計團隊之間的聯絡人。","collocation":"act as a liaison / liaison between","star":3,"category":"商務溝通","score":"900+","forms":["liaison"],"tips":["liaison 常考職務角色，注意發音與拼字。"],"tier":"900+ 拉分字"},{"id":"adv_29","word":"merger","pos":"n.","zh":"合併；公司合併","example":"Shareholders will vote on the proposed merger next week.","exampleZh":"股東將於下週就提議中的合併案進行表決。","collocation":"proposed merger / merger agreement","star":4,"category":"營運管理","score":"780-900","forms":["merger"],"tips":["merger and acquisition (M&A) 是常見組合。"],"tier":"825→900 核心缺口"},{"id":"adv_30","word":"negligible","pos":"adj.","zh":"微不足道的；可忽略的","example":"The change had a negligible effect on overall operating costs.","exampleZh":"這項變動對整體營運成本的影響微乎其微。","collocation":"negligible impact / negligible difference","star":3,"category":"一般專業","score":"900+","forms":["negligible"],"tips":["negligible ≈ insignificant / minimal。"],"tier":"900+ 拉分字"},{"id":"adv_31","word":"offset","pos":"v./n.","zh":"抵銷；彌補","example":"Higher online sales helped offset the decline in store revenue.","exampleZh":"較高的線上銷售有助於抵銷門市營收下滑。","collocation":"offset costs / offset a decline","star":4,"category":"金融與會計","score":"780-900","forms":["offset"],"tips":["offset 常出現在財務與趨勢敘述。"],"tier":"825→900 核心缺口"},{"id":"adv_32","word":"overhaul","pos":"n./v.","zh":"全面檢修；徹底改革","example":"The company plans to overhaul its outdated inventory system.","exampleZh":"公司計畫徹底改革過時的庫存系統。","collocation":"overhaul a system / major overhaul","star":3,"category":"營運管理","score":"900+","forms":["overhaul"],"tips":["overhaul 比 improve 強，表示大幅度翻修或改革。"],"tier":"900+ 拉分字"},{"id":"adv_33","word":"pending","pos":"adj./prep.","zh":"待處理的；在等待……期間","example":"The project remains on hold pending final approval from the board.","exampleZh":"該專案仍暫停，等待董事會最終核准。","collocation":"pending approval / pending application","star":4,"category":"一般專業","score":"780-900","forms":["pending"],"tips":["pending approval = awaiting approval，是 Part 7 常見壓縮表達。"],"tier":"825→900 核心缺口"},{"id":"adv_34","word":"preliminary","pos":"adj.","zh":"初步的；預備的","example":"Preliminary results indicate that customer satisfaction has improved.","exampleZh":"初步結果顯示顧客滿意度有所提升。","collocation":"preliminary results / preliminary report","star":4,"category":"一般專業","score":"780-900","forms":["preliminary"],"tips":["preliminary 不代表 final，常考時間先後關係。"],"tier":"825→900 核心缺口"},{"id":"adv_35","word":"procurement","pos":"n.","zh":"採購；取得","example":"The procurement department is evaluating bids from three suppliers.","exampleZh":"採購部門正在評估三家供應商的投標。","collocation":"procurement process / procurement department","star":3,"category":"採購與物流","score":"900+","forms":["procurement"],"tips":["procurement 比 purchase 更偏正式的企業採購流程。"],"tier":"900+ 拉分字"},{"id":"adv_36","word":"prospective","pos":"adj.","zh":"潛在的；未來的","example":"The seminar is designed to attract prospective clients.","exampleZh":"這場研討會旨在吸引潛在客戶。","collocation":"prospective customer / prospective employee","star":4,"category":"行銷與銷售","score":"780-900","forms":["prospective"],"tips":["prospective = potential；別和 perspective（觀點）混淆。"],"tier":"825→900 核心缺口"},{"id":"adv_37","word":"provision","pos":"n.","zh":"條款；供應；準備","example":"The agreement includes a provision allowing either party to terminate early.","exampleZh":"該協議包含一項允許任一方提前終止的條款。","collocation":"contractual provision / make provision for","star":3,"category":"法務合規與安全","score":"900+","forms":["provision"],"tips":["在合約語境 provision 很常不是「供應」，而是「條款」。"],"tier":"900+ 拉分字"},{"id":"adv_38","word":"reconcile","pos":"v.","zh":"核對；使一致；調和","example":"The accountant reconciles the bank statements at the end of each month.","exampleZh":"會計人員每月底會核對銀行對帳單。","collocation":"reconcile accounts / reconcile records","star":3,"category":"金融與會計","score":"900+","forms":["reconcile"],"tips":["reconcile 在會計語境常指核對帳目使其一致。"],"tier":"900+ 拉分字"},{"id":"adv_39","word":"rectify","pos":"v.","zh":"改正；矯正","example":"The billing department apologized and promptly rectified the error.","exampleZh":"帳務部門致歉並立即改正錯誤。","collocation":"rectify an error / rectify the situation","star":3,"category":"客戶服務","score":"900+","forms":["rectify"],"tips":["rectify 比 correct 更正式，常見於客訴與錯誤處理。"],"tier":"900+ 拉分字"},{"id":"adv_40","word":"reimbursement","pos":"n.","zh":"報銷；償還款項","example":"Employees must submit receipts to receive reimbursement for travel expenses.","exampleZh":"員工必須提交收據才能獲得差旅費報銷。","collocation":"expense reimbursement / seek reimbursement","star":4,"category":"金融與會計","score":"780-900","forms":["reimbursement"],"tips":["reimburse 是動詞；be reimbursed for + 費用。"],"tier":"825→900 核心缺口"},{"id":"adv_41","word":"retain","pos":"v.","zh":"保留；留住","example":"The company introduced flexible schedules to retain experienced employees.","exampleZh":"公司導入彈性工時以留住有經驗的員工。","collocation":"retain employees / retain records","star":4,"category":"人力資源","score":"780-900","forms":["retain"],"tips":["retain 可表示留住人才、保留文件或維持控制。"],"tier":"825→900 核心缺口"},{"id":"adv_42","word":"stringent","pos":"adj.","zh":"嚴格的；嚴苛的","example":"The new facility must meet stringent environmental standards.","exampleZh":"新設施必須符合嚴格的環境標準。","collocation":"stringent requirements / stringent regulations","star":3,"category":"法務合規與安全","score":"900+","forms":["stringent"],"tips":["stringent ≈ strict，但常搭 regulations、requirements、standards。"],"tier":"900+ 拉分字"},{"id":"adv_43","word":"subsequent","pos":"adj.","zh":"後續的；隨後的","example":"Subsequent inspections revealed no additional safety issues.","exampleZh":"後續檢查未發現其他安全問題。","collocation":"subsequent meeting / subsequent changes","star":4,"category":"一般專業","score":"780-900","forms":["subsequent"],"tips":["subsequent = following / later；注意和 consequent 不同。"],"tier":"825→900 核心缺口"},{"id":"adv_44","word":"subsidy","pos":"n.","zh":"補助金；津貼","example":"The project became financially viable after receiving a government subsidy.","exampleZh":"該專案在獲得政府補助後變得具有財務可行性。","collocation":"government subsidy / receive a subsidy","star":3,"category":"金融與會計","score":"900+","forms":["subsidy"],"tips":["subsidy 常見於政府補助、產業政策或費用分擔。"],"tier":"900+ 拉分字"},{"id":"adv_45","word":"tentative","pos":"adj.","zh":"暫定的；試探性的","example":"A tentative schedule will be circulated before the planning meeting.","exampleZh":"規劃會議前將傳閱一份暫定時程。","collocation":"tentative schedule / tentative date","star":4,"category":"會議與簡報","score":"780-900","forms":["tentative"],"tips":["tentative = not yet final；常考行程尚未確定。"],"tier":"825→900 核心缺口"},{"id":"adv_46","word":"terminate","pos":"v.","zh":"終止；結束","example":"Either party may terminate the agreement with thirty days' notice.","exampleZh":"任一方皆可在提前三十天通知後終止協議。","collocation":"terminate a contract / terminate employment","star":4,"category":"法務合規與安全","score":"780-900","forms":["terminate"],"tips":["termination 是名詞；合約、租約、雇用關係都常用。"],"tier":"825→900 核心缺口"},{"id":"adv_47","word":"undergo","pos":"v.","zh":"經歷；接受","example":"The lobby will undergo extensive renovation this winter.","exampleZh":"大廳今年冬天將進行大規模整修。","collocation":"undergo renovation / undergo training","star":4,"category":"一般專業","score":"780-900","forms":["undergo"],"tips":["undergo 後直接接名詞，不用 undergo through。"],"tier":"825→900 核心缺口"},{"id":"adv_48","word":"unprecedented","pos":"adj.","zh":"前所未有的","example":"The company experienced unprecedented demand for its newest product.","exampleZh":"公司最新產品出現前所未有的需求。","collocation":"unprecedented demand / unprecedented growth","star":3,"category":"一般專業","score":"900+","forms":["unprecedented"],"tips":["unprecedented 常用於新聞稿、績效與市場變化。"],"tier":"900+ 拉分字"},{"id":"adv_49","word":"viable","pos":"adj.","zh":"可行且能持續的","example":"Management concluded that opening a second branch was financially viable.","exampleZh":"管理階層認為開設第二家分店在財務上可行。","collocation":"viable option / financially viable","star":3,"category":"營運管理","score":"900+","forms":["viable"],"tips":["viable 比 feasible 更帶有「能成功運作、能存續」的意味。"],"tier":"900+ 拉分字"},{"id":"adv_50","word":"waive","pos":"v.","zh":"免除；放棄（權利或費用）","example":"The hotel agreed to waive the cancellation fee because of the flight disruption.","exampleZh":"飯店因航班中斷而同意免除取消費。","collocation":"waive a fee / waive the right to","star":3,"category":"法務合規與安全","score":"900+","forms":["waive"],"tips":["waive fee = 免收費用；waive a right = 放棄權利。"],"tier":"900+ 拉分字"},{"id":"adv_51","word":"comprehensive","pos":"adj.","zh":"全面的；詳盡的","example":"The consultant conducted a comprehensive review of the company's operations.","exampleZh":"顧問對公司的營運進行了全面檢討。","collocation":"comprehensive review / comprehensive report","star":4,"category":"一般專業","score":"780-900","forms":["comprehensive"],"tips":["comprehensive = covering all or nearly all aspects。"],"tier":"825→900 核心缺口"}];
 const STRICT_BASIC_WORDS=new Set(["a","about","account","across","after","afternoon","airport","all","am","an","and","another","answer","any","applicant","applicants","are","ask","at","available","bad","bank","be","because","been","before","being","benefit","benefits","between","big","bill","book","books","boss","box","boxes","branch","branches","building","bus","business","but","buy","by","call","came","can","candidate","candidates","car","card","cash","chair","city","client","close","coffee","come","company","computer","computers","copies","copy","cost","could","country","credit","customer","day","department","departments","desk","did","different","dinner","discount","do","document","documents","does","door","down","during","each","early","easy","email","employee","evening","every","facilities","facility","far","fast","few","file","files","first","flight","food","for","form","forms","from","gave","get","give","go","goes","gone","good","got","guest","guests","had","hard","has","have","he","hear","help","her","high","him","home","hotel","hour","house","how","i","if","important","in","inside","internet","into","is","it","item","items","job","keep","know","last","late","learn","left","less","let","letter","letters","like","listen","long","look","love","low","lunch","made","make","manager","many","market","may","me","meal","meet","meeting","menu","might","minute","mobile","money","month","more","morning","most","much","must","near","need","new","next","no","not","of","office","old","on","online","open","or","order","orders","other","out","outside","over","package","packages","paid","paper","papers","pay","payment","phone","phones","plane","play","price","printer","printers","product","products","purchase","purchases","put","read","receive","refund","refunds","reservation","reservations","restaurant","right","road","room","sale","sales","same","save","say","schedule","schedules","see","sell","send","service","services","shall","she","shipment","shipments","shop","shopping","short","should","slow","small","so","some","speak","spend","staff","start","stop","store","street","study","supplier","suppliers","table","take","talk","taxi","team","tell","tenant","tenants","that","the","them","these","they","think","this","those","through","ticket","tickets","time","to","today","tomorrow","took","town","train","travel","trip","under","up","us","use","venue","venues","very","visitor","visitors","want","warranties","warranty","was","watch","water","we","web","website","week","went","were","what","when","where","which","who","why","will","window","with","without","work","worker","would","write","year","yes","yesterday","you"]);
+const MASTER_1200_WORDS=["profitability","allocate","decisive","diversify","optimization","underestimate","delegation","facilitate","prospective","contractual","substantial","constraint","pipeline","strategically","surpass","cutting-edge","seamless","competitiveness","consensus","inevitably","likelihood","uncertainty","absorption","allegation","amendment","approximation","beneficiary","compliance","confiscate","correlation","corruption","deductible","depreciate","devaluation","enforceable","enforcement","equity","exemption","fluctuate","hazardous","incorporation","inflationary","intermediary","issuance","legislative","legitimate","liability","liable","liquidity","maturity","monetary","negligence","petition","quantify","receivable","recession","refinance","reinvestment","remittance","restrictive","sanction","speculate","speculation","speculative","subsidize","taxation","testify","valuation","violation","volatility","accountable","acquisition","adversity","aggravate","alignment","augment","centralize","coalition","commodity","complication","concession","consignment","consolidate","contaminate","contingency","continuity","craftsmanship","decentralize","deficiency","deliverable","demolition","depression","deregulation","deteriorate","devastate","elevate","emission","envision","evaporate","feasible","foreseeable","franchise","fusion","governance","incorporate","industrialize","inefficiency","inflate","instability","insulation","intervention","irreplaceable","irreversible","jeopardize","liberalize","manipulate","maximization","mitigate","mobility","mobilize","necessitate","operative","penetrate","perishable","predicament","privatize","procurement","progression","provision","reactive","redundancy","requisition","revive","scarcity","stagnate","stagnation","subsidiary","surveillance","susceptible","systematize","thrive","unsanitary","utilization","variance","affiliate","affiliation","alleviate","allotment","aspiration","collectible","commemorative","competency","cultivate","cultivation","deliberation","demotion","designation","discriminate","disqualify","downsize","empowerment","endorsement","exclusion","expatriate","exposition","induction","injection","legendary","lucrative","mandate","manipulation","migration","observance","penalize","popularize","prestigious","proposition","readership","redeemable","redemption","reinforcement","reinstate","segmentation","sentiment","subordinate","succession","traction","abolish","accrue","allege","auditor","authenticate","autonomous","bankruptcy","bracket","breach","brokerage","buyout","capitalist","clause","collateral","compliant","computation","corrupt","counterfeit","creditor","cyclical","debtor","decimal","density","deterrent","devalued","differential","disclosure","distortion","diversification","dividend","enforce","expenditure","federal","fraudulent","goodwill","hereby","inaccessible","incurred","inherit","issuer","ledger","marginal","mortgage","nominal","nontransferable","outflow","overdrawn","payback","payout","policyholder","populate","precision","pretax","reconcile","reconciliation","regulator","regulatory","reinvest","replicate","revolutionize","royalty","safeguard","saturate","seize","simulate","simulation","solvent","stockbroker","subsidy","synchronize","treasurer","treasury","trustee","tumble","unsecured","uphold","variable","verdict","vigilant","volatile","waiver","warrant","abundantly","accredit","adverse","adversely","attain","benchmark","buffer","bureaucracy","bureaucratic","bypass","ceremonial","confine","conquer","constrain","controller","counteroffer","curtail","custom-built","degrade","deplete","dilute","diminish","disperse","displace","divert","embark","endangered","endeavor","endure","entrepreneur","epidemic","expedite","exploit","governor","heritage","hierarchy","historic","hurdle","impair","impede","impending","inaugural","incrementally","inhibit","instrumental","joint-venture","landfill","legacy","leverage","manifest","mastermind","mechanism","momentum","monopoly","multinational","municipal","offload","offshore","optimal","outlast","outpace","outperform","outweigh","overhaul","patent","patronage","phenomenon","pioneer","plateau","pledge","prevail","procure","propel","proprietor","reconstruct","refinery","refurbish","reliant","remedy","renegotiated","reproduce","restrain","restraint","restructure","revolve","robust","sacrifice","salvage","scorecard","stagnant","stakeholder","steadiness","stockpiling","strain","subcontract","subcontractor","surplus","surrender","sustain","synergy","synthetic","tactical","tariff","tastefully","threshold","turbulent","undervalue","unprecedented","untimely","venture","withstand","abide","acclaim","accordance","accountability","accusation","acquaintance","adjourn","advocate","affirmation","agreeable","ambiguous","amplify","annum","anonymous","anticipation","appraisal","apprehensive","aptitude","argumentative","articulate","attainable","audit","bail","ballot","boycott","bribe","casualty","characterize","clientele","commemorate","commence","commentary","compel","complement","complementary","composition","compulsory","conceive","conclusive","confer","confidentiality","confrontation","consciousness","consolidation","contemplate","contradiction","convene","corrective","correlate","credential","credibility","credible","critique","customary","deceive","deception","deed","deliberate","demographic","demote","derive","designate","deviate","deviation","dictate","differentiate","differentiation","directive","discharge","discrepancy","discretion","discrimination","disguise","disqualification","elaborate","empower","enact","endorse","enlist","esteem","ethical","exaggerate","exemplify","exempt","expressive","fabricate","facilitator","fatigue","formality","formulate","foster","fraud","friction","fringe","front-runner","harass","hostility","iconic","illuminate","immune","imperative","implication","improbable","improvise","incompetent","inconsistency","increment","incur","indecisive","indicative","indifference","intensify","intimidate","invaluable","jury","justification","justify","levy","liberal","liberty","literacy","mediate","monopolize","narrative","normalize","notion","novelty","nurture","omission","outreach","overqualified","overstate","pact","patronize","perceive","perception","perceptive","plausible","predecessor","premier","prerequisite","preside","prestige","privilege","proceedings","procrastinate","proximity","psychological","questionable","racial","receptive","reconvene","rectify","redeem","reluctance","remit","reposition","resonate","restate","restatement","runner-up","scrutinize","sensitivity","signify","sincerity","solicit","stance","subjective","symposium","tailor-made","tangible","tedious","tenure","testimonial","tolerance","transcription","transferable","transparency","unanimous","undeniable","vacate","waive","agile","analytic","aviation","brace","cease","collision","curb","decode","defy","deploy","deter","diagnostic","dioxide","disassemble","distort","distress","domain","embedded","evicted","exert","exponential","forge","gauge","gratuity","grip","haul","inject","obsolete","override","parameter","peripheral","predictor","render","retrieval","ridership","seamlessly","spectrum","sprint","stake","subset","tech-savvy","technically","terrain","tier","turbulence","yield","acceleration","adaptive","aggregate","attributable","aversion","capitalize","citizenship","cognitive","competence","complexity","comprise","conception","configuration","consultancy","contraction","convertible","conviction","cumulative","customization","deployment","deprive","devotion","digitization","diligence","disastrous","distinction","dominance","domination","elevation","emergence","entity","entrepreneurial","equate","essence","ethic","evolutionary","formulation","fragment","impairment","incidence","inequality","infectious","inhibition","intangible","integration","integrity","intuition","invasion","legislation","merit","misidentify","originality","pharmaceutical","premise","presidency","prevalence","prime","qualitative","quantitative","rationality","regularity","rigorous","significance","sophisticate","variability","viable","vulnerable","abstract","accord","acquaint","adhere","admittedly","affirm","amongst","arouse","assert","astonishingly","attribute","belatedly","bewildering","biannual","bilateral","burdensome","chronological","classification","cluster","coherent","coincide","collectively","commonplace","compound","comprehensible","conceal","concede","concurrently","condense","conform","consent","constitute","contend","contradict","controversial","converse","conversely","correspondent","counterpart","customarily","deferral","deficient","deliberately","depict","diplomacy","diplomat","diplomatic","dispense","embed","embrace","emit","encompass","enlightening","enrich","entail","entirety","exceptional","explicit","explicitly","expressly","externally","finely","firsthand","flatter","flawless","footnote","foremost","generic","genuinely","hectic","heighten","hostile","impartially","implicit","implicitly","inadvertently","incidental","incline","indifferent","inherently","insistent","intent","interim","interpretation","intervene","intuitively","involuntarily","irrelevant","keenly","linear","lingering","manuscript","markedly","minimally","modestly","namely","narrowly","notably","noteworthy","null","oblige","observant","offset","outrage","parallel","periodical","pertaining","pertinent","pivot","portfolio","portrayal","practitioner","pragmatic","precede","predominantly","prejudice","presumably","presume","prevalent","prominent","proponent","protocol","provoke","proxy","rational","reconsideration","reexamine","refrain","regrettably","reluctantly","representation","resent","revert","rigorously","sequential","shortcoming","shuffle","skeptic","skeptical","skepticism","sluggish","spontaneously","spotless","stereotype","subsequent","supplemental","suppress","temper","tentatively","terminology","thesis","thoughtfully","transparent","trivial","unanimously","unbiased","underlying","undermine","undoubtedly","unease","upbeat","utmost","versatile","whereas","withhold","centerpiece","maneuver","precedent","wary","acute","adept","allot","amend","amortization","arguably","autonomy","behavioral","bolster","bubble","cleanse","combat","commissioner","conceptual","constituent","contender","contradictory","controversy","converge","counsel","defer","deficit","denominate","dense","dilemma","duly","ecological","embody","externality","fiduciary","finite","frontier","grasp","habitual","hedge","hone","hypothetical","imminent","incremental","industrialization","infinite","inherent","insider","instinct","institutional","integral","intellectual","intrigue","intrinsic","lateral","lesser","magnitude","mainstream","materially","maximal","median","mere","methodology","migrant","mindset","obscure","optimum","outward","oversight","personalization","phenomenal","philosophy","policymaker","predator","predetermine","profound","proportional","prudent","radical","rationale","realism","regime","reportedly","reversal","rigid","scrutiny","shortfall","slack","sphere","spiral","spur","statistically","stimulus","subtle","summit","supplementation","sustainability","symbolic","tally","tender","theoretical","theorist","thereby","tightness","triumph","turmoil","underlie","unmet","unspecified","variant","veteran","void","whereby","wholly","constituency","constructively","simultaneously","unconditionally","bias","crude","deem","erode","facet","loom","niche","norm","probe","prone","recuperate","arbitrage","debenture","multiplier","oscillation","regression","sovereign","subprime","tranche","trustworthiness","circumscribe","relinquish","censure","irretrievable","spurious","countervailing","membrane","nonlinear","dissertation","electorate","infinity","discourse","fleetingly","kicker","rhetoric","clench","equilibrium","flutter","hitherto","ideological","interlace","longitudinal","referendum","secrete","secular","sovereignty","temporal","cardiovascular","accumulate","disagreement","fundraise","inflation","payable","precaution","prepayment","proportion","reimbursement","restriction","settlement","accelerate","accommodate","auction","capacity","clearance","consistency","consumption","coordination","defective","determination","devise","disruption","distribution","division","dominate","durable","estimation","execution","exploration","indication","innovate","investigate","investigation","massive","maximize","minimize","modernize","negotiate","negotiation","optimize","ownership","prediction","prosperous","quotation","regulate","renovate","reorganize","replacement","reputable","resolution","specification","specify","stability","standardize","sustainable","utility","utilize","adaptability","allowance","certification","charity","compensate","compensation","creativity","dealership","desirable","encouragement","engagement","immigration","impressive","independence","minority","nomination","personalize","persuasive","placement","profession","proficiency","projection","publicity","publicize","qualification","qualify","recruitment","relocate","relocation","reputation","resignation","retention","sponsorship","stimulate","supervise","supervision","terminate","treatment","unemployment","vacancy","voluntary","activation","analyst","appeal","attorney","automate","automation","bankrupt","banned","borrower","collector","compatible","complimentary","comply","deduct","detection","disable","downturn","enable","estate","exceed","financially","fortune","functionality","incident","installation","insure","interactive","investor","legally","lender","malfunction","payroll","premium","prepaid","prohibit","quarterly","reimburse","reliability","renewal","residence","revenue","saving","settle","threat","trader","unacceptable","wealth","wealthy","withdraw","witness","architecture","assorted","atmosphere","bargain","battle","blueprint","breakdown","bundle","carrier","closure","commerce","component","consultant","consume","contractor","controlled","coordinator","cost-effective","costly","council","crisis","crucial","cutback","defeat","defect","discontinue","disposal","distributor","domestic","dominant","drastic","drastically","drawback","dynamic","eco-friendly","economical","effectiveness","efficiently","emerge","entertain","environmental","establish","execute","export","exporter","extreme"];
 const FULL_URLS = [
   "https://huggingface.co/datasets/kknono668/toeic-vocab-tw/resolve/main/data/toeic_vocabulary.json?download=true",
   "https://huggingface.co/datasets/kknono668/toeic-vocab-tw/resolve/main/data/toeic_vocabulary.json"
 ];
 const K_PROGRESS="toeic900_standalone_progress_v2";
 const K_SETTINGS="toeic900_standalone_settings_v2";
-const DB_NAME="toeic900_strict825_v3", STORE="kv", DATA_KEY="strict825_words_v3";
+const DB_NAME="toeic900_master1200_v6", STORE="kv", DATA_KEY="master1200_words_v1";
 
 let words = BUILTIN.map((w,i)=>normalizeBuiltin(w,i));
 let fullData = false;
@@ -15,7 +16,7 @@ let currentScreen="home", currentDeck=1, currentMode=null;
 let flash=[], flashIndex=0, flashFlipped=false;
 let matchState=null, quizState=null, clozeState=null;
 let progress = loadJSON(K_PROGRESS,{});
-let settings = Object.assign({theme:"light",autoSpeak:false,flashDirection:"en-zh"},loadJSON(K_SETTINGS,{}));
+let settings = Object.assign({theme:"light",autoSpeak:false,flashDirection:"en-zh",speechRate:.88},loadJSON(K_SETTINGS,{}));
 
 function normalizeBuiltin(w,i){
   return {
@@ -41,7 +42,9 @@ function normalizeSource(w){
     category:String(w.category||"一般專業"),
     star:Number(w.star_rating||0),
     score:String(w.toeic_score_range||""),
-    tier:(String(w.toeic_score_range||"").trim()==="900+" ? "900+ 拉分字" : "825→900 核心缺口"),
+    tier:(String(w.toeic_score_range||"").trim()==="900+"
+      ? "900+ 拉分字"
+      : (String(w.toeic_score_range||"").trim()==="600-780" ? "高價值橋接" : "825→900 核心缺口")),
     forms:[...new Set(forms)],
     examples:ex,
     tips:tips.length?tips:["請連同詞性、搭配與商務情境一起記憶。"],
@@ -52,68 +55,30 @@ function hash(s){let h=2166136261;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i)
 function seededShuffle(a,seed=9002026){a=[...a];let x=seed>>>0;for(let i=a.length-1;i>0;i--){x=(Math.imul(1664525,x)+1013904223)>>>0;let j=x%(i+1);[a[i],a[j]]=[a[j],a[i]]}return a}
 function select2000(raw){
   const valid=(raw||[]).filter(x=>x&&x.english_word&&x.chinese_definition);
-  const accepted=[];
-  const seen=new Set();
-  const stats={source:valid.length,accepted:0,rejectedScore:0,rejectedStars:0,rejectedBasic:0,rejectedRare:0};
-
+  const byWord=new Map();
   for(const x of valid){
-    const word=String(x.english_word||"").trim();
-    const key=word.toLowerCase();
-    const range=String(x.toeic_score_range||"").trim();
-    const stars=Number(x.star_rating||0);
-
-    // 825 -> 900: never use sub-780 rows.
-    if(range!=="780-900" && range!=="900+"){stats.rejectedScore++;continue}
-
-    // Dataset's 5★ is "core high-frequency / all test takers should know":
-    // intentionally exclude it from this advanced bank.
-    // 1★ is too rare for 825 -> 900 ROI.
-    if(stars===5){stats.rejectedStars++;continue}
-    if(stars<=1){stats.rejectedRare++;continue}
-
-    // For target band, prefer meaningful mid/high-value entries.
-    if(range==="780-900" && !(stars===3 || stars===4)){stats.rejectedStars++;continue}
-    if(range==="900+" && !(stars===2 || stars===3 || stars===4)){stats.rejectedStars++;continue}
-
-    // Safety net against obvious basic single words.
-    // Phrases are handled independently, so "cash flow" can survive while "cash" cannot.
-    if(!word.includes(" ") && STRICT_BASIC_WORDS.has(key)){stats.rejectedBasic++;continue}
-
-    // Additional low-value safety checks.
-    if(key.length<=3 && !["lien","vat"].includes(key)){stats.rejectedBasic++;continue}
-    if(seen.has(key))continue;
-    seen.add(key);
-    accepted.push(x);
+    const k=String(x.english_word||"").trim().toLowerCase();
+    if(k&&!byWord.has(k)) byWord.set(k,x);
   }
-
-  // Rank for TOEIC 825->900 usefulness, not for rarity.
-  const core=accepted
-    .filter(x=>String(x.toeic_score_range).trim()==="780-900")
-    .sort((a,b)=>Number(b.star_rating||0)-Number(a.star_rating||0) || String(a.english_word).localeCompare(String(b.english_word)));
-  const stretch=accepted
-    .filter(x=>String(x.toeic_score_range).trim()==="900+")
-    .sort((a,b)=>Number(b.star_rating||0)-Number(a.star_rating||0) || String(a.english_word).localeCompare(String(b.english_word)));
-
-  // Quality first. 75% practical target-band + 25% stretch.
-  // Never fill with basic words just to reach a round number.
-  const maxTotal=1500;
-  const targetCore=Math.min(core.length,Math.round(maxTotal*0.75));
-  const targetStretch=Math.min(stretch.length,maxTotal-targetCore);
-  let picked=[...core.slice(0,targetCore),...stretch.slice(0,targetStretch)];
-
-  if(picked.length<maxTotal){
-    const used=new Set(picked.map(x=>String(x.english_word).trim().toLowerCase()));
-    for(const x of [...core.slice(targetCore),...stretch.slice(targetStretch)]){
-      const k=String(x.english_word).trim().toLowerCase();
-      if(used.has(k))continue;
-      used.add(k);picked.push(x);
-      if(picked.length>=maxTotal)break;
-    }
+  const selected=[];
+  const missing=[];
+  for(const target of MASTER_1200_WORDS){
+    const x=byWord.get(target.toLowerCase());
+    if(x) selected.push(normalizeSource(x));
+    else missing.push(target);
   }
-
-  lastFilterStats={...stats,accepted:picked.length};
-  if(!picked.length) throw new Error("嚴格篩選後沒有可用高分詞條");
-  return seededShuffle(picked.map(normalizeSource),8259003);
+  lastFilterStats={
+    source:valid.length,
+    accepted:selected.length,
+    rejectedScore:0,rejectedStars:0,rejectedBasic:0,rejectedRare:0,
+    missing:missing.length
+  };
+  if(missing.length){
+    console.warn("MASTER 1200 missing words:",missing);
+    throw new Error(`固定字庫缺少 ${missing.length} 字：${missing.slice(0,8).join(", ")}`);
+  }
+  // 固定亂數：每次、每台裝置的 Part 01–24 都完全一致。
+  return seededShuffle(selected,8259001200);
 }
 function pstate(id){
   if(!progress[id]) progress[id]={seen:0,level:0,correct:0,wrong:0,last:0,due:0,interval:0,fav:false};
@@ -135,21 +100,26 @@ function quizResult(w,ok){const p=pstate(w.id);p.seen++;p.last=now();if(ok){p.co
 function markSeen(w){const p=pstate(w.id);if(!p.seen){p.seen=1;p.last=now();saveProgress()}}
 function deckWords(n){return words.slice((n-1)*50,n*50)}
 function deckCount(){return Math.ceil(words.length/50)}
-const TIERS=["825→900 核心缺口","900+ 拉分字"];
+const TIERS=["825→900 核心缺口","900+ 拉分字","高價值橋接"];
 let activeTierFilter="all";
 let activeCategoryFilter="all";
 let lastFilterStats={source:0,accepted:0,rejectedScore:0,rejectedStars:0,rejectedBasic:0,rejectedRare:0};
 
-function tierShort(t){return t==="900+ 拉分字"?"900+":"核心"}
+function tierShort(t){
+  if(t==="900+ 拉分字")return "900+";
+  if(t==="高價值橋接")return "橋接";
+  return "核心";
+}
 function tierCounts(list=words){
-  const o={"825→900 核心缺口":0,"900+ 拉分字":0};
+  const o={"825→900 核心缺口":0,"900+ 拉分字":0,"高價值橋接":0};
   list.forEach(w=>{if(o[w.tier]!==undefined)o[w.tier]++});
   return o;
 }
 function priorityWords(list=words){
   const core=list.filter(w=>w.tier==="825→900 核心缺口");
+  const bridge=list.filter(w=>w.tier==="高價值橋接");
   const stretch=list.filter(w=>w.tier==="900+ 拉分字");
-  return [...shuffle(core),...shuffle(stretch)];
+  return [...shuffle(core),...shuffle(bridge),...shuffle(stretch)];
 }
 function filteredDeckWords(){
   let a=deckWords(currentDeck);
@@ -193,7 +163,7 @@ function render(name){
 function statusHTML(){
   return fullData
     ? `<span class="pill good">● 825→900 嚴格字庫 ${words.length.toLocaleString()} 字</span>`
-    : `<span class="pill warn">● 825→900 精選離線字庫 ${words.length} 字</span><button class="btn" data-action="load-full">載入嚴格高分字庫</button>`;
+    : `<span class="pill warn">● 825→900 精選離線字庫 ${words.length} 字</span><button class="btn" data-action="load-full">載入 Master 1200</button>`;
 }
 function renderHome(){
   const s=globalStats(), pct=Math.round(s.seen/words.length*100);
@@ -213,15 +183,16 @@ function renderHome(){
   <div class="card">
     <h3>825 → 900 嚴格字庫</h3>
     ${(()=>{const tc=tierCounts();return `<div class="stats">
-      <div class="stat"><b>${tc["825→900 核心缺口"]}</b><span>核心缺口</span></div>
+      <div class="stat"><b>${tc["825→900 核心缺口"]}</b><span>780–900 核心</span></div>
       <div class="stat"><b>${tc["900+ 拉分字"]}</b><span>900+ 拉分</span></div>
-      <div class="stat"><b>0</b><span>5★基礎字</span></div>
+      <div class="stat"><b>${tc["高價值橋接"]}</b><span>高價值橋接</span></div>
     </div>`})()}
     <div class="notice" style="margin-top:12px"><b>不再拿基本字灌數量。</b><br>
-    完整字庫只收 780–900 的 3–4★ 與 900+ 的 2–4★；5★ 基礎高頻詞、1★低效益冷字、以及明顯基礎單字全部排除。</div>
-    <div class="grid2" style="margin-top:10px">
-      <button class="btn primary" data-action="study-tier" data-tier="825→900 核心缺口">主攻核心缺口</button>
+    Master 1200 已固定：780–900 為主體，900+ 用來拉高上限；另保留少量 600–780「高價值橋接詞」，只收對商務閱讀、Part 5/7 改寫仍有價值者。bus、cash 等基礎字、低效益冷字與大量重複屈折詞已排除。</div>
+    <div class="grid3" style="margin-top:10px">
+      <button class="btn primary" data-action="study-tier" data-tier="825→900 核心缺口">主攻 780–900</button>
       <button class="btn warn" data-action="study-tier" data-tier="900+ 拉分字">挑戰 900+</button>
+      <button class="btn" data-action="study-tier" data-tier="高價值橋接">快速補橋接</button>
     </div>
   </div>
   <div class="card">
@@ -234,13 +205,13 @@ function renderHome(){
   <div class="card">
     <h3>目前資料模式</h3>
     <div class="notice">${fullData
-      ? "825→900 嚴格高分字庫已載入。資料會嘗試快取在這台裝置；之後即使直接開 HTML，也可優先讀取快取。"
-      : "這份 HTML 本身已內建 50 個 825→900 高分精選字，所以直接從 Android 檔案管理員開啟也能正常使用。嚴格高分字庫可在有網路時按上方按鈕載入；若手機限制 content:// 跨網域存取，也可以在設定頁匯入資料集 JSON。"}
+      ? "TOEIC 825→900 Master 1200 已載入。資料會嘗試快取在這台裝置；之後即使直接開 HTML，也可優先讀取快取。"
+      : "這份 HTML 本身已內建 50 個 825→900 高分精選字，所以直接從 Android 檔案管理員開啟也能正常使用。固定 Master 1200 可在有網路時按上方按鈕載入；若手機限制 content:// 跨網域存取，也可以在設定頁匯入資料集 JSON。"}
     </div>
   </div>`;
 }
 function renderDecks(){
-  let html=`<div class="card"><div class="row"><div><h2 style="margin:0">${deckCount()} 個單字夾</h2><div class="small">每 Part 最多 50 字</div></div>${fullData?'<span class="pill good">2,000 字</span>':'<span class="pill warn">50 字</span>'}</div></div><div class="deckgrid">`;
+  let html=`<div class="card"><div class="row"><div><h2 style="margin:0">${deckCount()} 個單字夾</h2><div class="small">每 Part 最多 50 字</div></div>${fullData?`<span class="pill good">${words.length.toLocaleString()} 字</span>`:'<span class="pill warn">50 字</span>'}</div></div><div class="deckgrid">`;
   for(let i=1;i<=deckCount();i++){let st=deckStats(i);html+=`<button class="deckcard" data-action="open-deck" data-deck="${i}"><div class="part">Part ${String(i).padStart(2,"0")}</div><div class="meta">${st.total} words · 已看 ${st.seen} · 熟練 ${st.mastered}</div><div class="mini"><i style="width:${st.pct}%"></i></div></button>`}
   html+=`</div>`;document.getElementById("screen-decks").innerHTML=html;
 }
@@ -257,6 +228,7 @@ function renderDeck(){
         <button class="btn ${activeTierFilter==="all"?"primary":""}" data-action="tier-filter" data-tier="all">全部 ${dw.length}</button>
         <button class="btn ${activeTierFilter==="825→900 核心缺口"?"primary":""}" data-action="tier-filter" data-tier="825→900 核心缺口">核心 ${tc["825→900 核心缺口"]}</button>
         <button class="btn ${activeTierFilter==="900+ 拉分字"?"primary":""}" data-action="tier-filter" data-tier="900+ 拉分字">900+ ${tc["900+ 拉分字"]}</button>
+        <button class="btn ${activeTierFilter==="高價值橋接"?"primary":""}" data-action="tier-filter" data-tier="高價值橋接">橋接 ${tc["高價值橋接"]}</button>
       </div>
       <div class="row wrap" style="justify-content:flex-start;margin-top:8px">
         <button class="btn ${activeCategoryFilter==="all"?"primary":""}" data-action="category-filter" data-category="all">所有主題</button>
@@ -276,7 +248,7 @@ function renderDeck(){
 function wordRow(w){
   const p=progress[w.id]||{};
   return `<div class="listrow" data-action="word-detail" data-id="${w.id}">
-    <div class="row"><div class="grow"><div class="wordline">${esc(w.word)}</div><div class="zh">${esc(w.zh)}</div></div><div class="small">Lv.${p.level||0}${p.fav?" ★":""}</div></div>
+    <div class="row"><div class="grow"><div class="wordline">${esc(w.word)}</div><div class="zh">${esc(w.zh)}</div></div><div class="row" style="gap:6px"><button class="speak-mini" data-action="speak" data-word="${attr(w.word)}" title="播放發音" aria-label="播放 ${attr(w.word)} 發音">🔊</button><div class="small">Lv.${p.level||0}${p.fav?" ★":""}</div></div></div>
     <div class="badges"><span class="badge">${esc(w.pos||"")}</span><button class="badge" style="color:inherit" data-action="category-filter" data-category="${attr(w.category||"")}">${esc(w.category||"")}</button><button class="badge" style="color:inherit" data-action="tier-filter" data-tier="${attr(w.tier||"825→900 核心缺口")}">${esc(w.tier||"825→900 核心缺口")}</button>${w.star?`<span class="badge">${"★".repeat(Math.min(5,w.star))}</span>`:""}</div>
   </div>`;
 }
@@ -297,10 +269,10 @@ function renderFlash(){
   document.getElementById("screen-flash").innerHTML=`
     <div class="row"><button class="btn" data-action="back-deck">‹ Part ${String(currentDeck).padStart(2,"0")}</button><div class="small">${flashIndex+1} / ${flash.length}</div></div>
     <div class="flashwrap"><div class="flashcard ${flashFlipped?"flipped":""}" id="flashCard" data-action="flip">
-      <div class="face front"><div class="${dir==="zh-en"?"bigzh":"bigword"}">${esc(front)}</div><div class="muted" style="margin-top:10px">${esc(w.pos||"")}</div><div class="small" style="margin-top:30px">點一下翻面</div></div>
+      <div class="face front"><div class="${dir==="zh-en"?"bigzh":"bigword"}">${esc(front)}</div>${dir==="en-zh"?`<button class="voice-fab" data-action="speak" data-word="${attr(w.word)}" aria-label="播放發音">🔊 播放</button>`:""}<div class="muted" style="margin-top:10px">${esc(w.pos||"")}</div><div class="small" style="margin-top:30px">點一下翻面</div></div>
       <div class="face back"><div class="${dir==="zh-en"?"bigword":"bigzh"}">${esc(backTitle)}</div>
         <div class="badges"><span class="badge">${esc(w.pos||"")}</span><span class="badge">${esc(w.category||"")}</span><span class="badge">${esc(w.tier||"")}</span><button class="btn" style="padding:5px 8px" data-action="speak" data-word="${attr(w.word)}">🔊</button></div>
-        ${ex?`<div class="example"><b>${esc(ex.english)}</b><br><span class="muted">${esc(ex.chinese)}</span></div>`:""}
+        ${ex?`<div class="example"><div class="row" style="align-items:flex-start"><b class="grow">${esc(ex.english)}</b><button class="speak-mini" data-action="speak-text" data-text="${attr(ex.english)}" title="播放例句">🔊</button></div><span class="muted">${esc(ex.chinese)}</span></div>`:""}
         ${w.tips?.[0]?`<div class="example"><b>TOEIC 重點</b><br>${esc(w.tips[0])}</div>`:""}
       </div>
     </div></div>
@@ -451,6 +423,7 @@ function renderSettings(){
       : (location.protocol==="https:" ? "若瀏覽器符合條件，可點右上角 ⇩ 安裝。" : "本機檔案只能預覽；要安裝請部署到 HTTPS 網址。")}</div>
     <div class="listrow"><div class="row"><div><b>翻卡方向</b><div class="small">英文→中文／中文→英文／隨機</div></div><select id="dirSel" class="btn"><option value="en-zh">英 → 中</option><option value="zh-en">中 → 英</option><option value="random">隨機</option></select></div></div>
     <div class="listrow"><div class="row"><div><b>自動發音</b><div class="small">翻到英文正面時自動朗讀</div></div><input id="autoSpeak" type="checkbox" ${settings.autoSpeak?"checked":""}></div></div>
+    <div class="listrow"><div class="row"><div><b>語音速度</b><div class="small">單字與例句共用</div></div><select id="speechRateSel"><option value=".75">0.75×</option><option value=".88">0.88×</option><option value="1">1.00×</option><option value="1.1">1.10×</option></select></div></div>
   </div>
   <div class="card"><h3>字庫</h3><div class="data-status">${statusHTML()}</div><div class="notice" style="margin-top:10px"><b>Strict v3：</b>使用全新快取空間，不會讀取舊版含 bus / cash 的字庫。</div>
     <div class="spacer12"></div><button class="btn block" data-action="import-dataset">從手機匯入原始資料集 JSON（會自動嚴格過濾）</button>
@@ -458,15 +431,15 @@ function renderSettings(){
     ${fullData?'<button class="btn bad block" data-action="clear-data">清除完整字庫快取，回到 50 字</button>':""}
   </div>
   <div class="card"><h3>學習紀錄</h3><div class="grid2"><button class="btn" data-action="export-progress">匯出進度</button><button class="btn" data-action="import-progress">匯入進度</button></div><div class="spacer8"></div><button class="btn bad block" data-action="reset-progress">清除全部學習紀錄</button></div>
-  <div class="card"><h3>資料來源</h3><p class="small">高分字庫來源：kknono668/toeic-vocab-tw；App 僅選 780–900 與 900+ 詞條，並分成「825 應會／核心缺口／900+ 拉分」三層，CC BY-SA 4.0。本工具非 ETS 官方產品。</p></div>`;
-  setTimeout(()=>{const d=document.getElementById("dirSel");if(d){d.value=settings.flashDirection;d.onchange=e=>{settings.flashDirection=e.target.value;saveSettings()}}const a=document.getElementById("autoSpeak");if(a)a.onchange=e=>{settings.autoSpeak=e.target.checked;saveSettings()}},0);
+  <div class="card"><h3>資料來源</h3><p class="small">字庫來源：kknono668/toeic-vocab-tw（CC BY-SA 4.0）。本版使用固定的 TOEIC 825→900 Master 1200 白名單；不再因資料集更新而改變 Part 內容。本工具非 ETS 官方產品。</p></div>`;
+  setTimeout(()=>{const d=document.getElementById("dirSel");if(d){d.value=settings.flashDirection;d.onchange=e=>{settings.flashDirection=e.target.value;saveSettings()}}const a=document.getElementById("autoSpeak");if(a)a.onchange=e=>{settings.autoSpeak=e.target.checked;saveSettings()};const sr=document.getElementById("speechRateSel");if(sr){sr.value=String(settings.speechRate??.88);sr.onchange=e=>{settings.speechRate=Number(e.target.value)||.88;saveSettings()}}},0);
 }
 function renderStats(){
   const s=globalStats(),levels=[0,0,0,0,0,0];words.forEach(w=>levels[Math.min(5,progress[w.id]?.level||0)]++);
   document.getElementById("screen-stats").innerHTML=`
   <div class="card"><h2>學習統計</h2><div class="stats"><div class="stat"><b>${s.seen}</b><span>已看</span></div><div class="stat"><b>${s.mastered}</b><span>熟練</span></div><div class="stat"><b>${s.weak}</b><span>弱點</span></div></div></div>
   <div class="card"><h3>熟練度分布</h3>${levels.map((n,i)=>`<div class="row" style="margin:8px 0"><span>Lv.${i}</span><div class="progress grow"><div style="width:${Math.round(n/words.length*100)}%"></div></div><span class="small">${n}</span></div>`).join("")}</div>
-  <div class="card"><h3>資料</h3><p class="muted">${fullData?"完整 2,000 字模式":"825→900 精選 50 字離線模式"}</p></div>`;
+  <div class="card"><h3>資料</h3><p class="muted">${fullData?"Master 1200 固定字庫模式":"825→900 精選 50 字離線模式"}</p></div>`;
 }
 function openDetail(id){
   const w=words.find(x=>x.id===id);if(!w)return;const p=pstate(w.id),ex=w.examples||[];
@@ -475,14 +448,26 @@ function openDetail(id){
    <div class="row wrap"><div class="badges"><span class="badge">${esc(w.pos||"")}</span><span class="badge">${esc(w.category||"")}</span><span class="badge">${esc(w.score||"")}</span><span class="badge">${esc(w.tier||"")}</span></div>
    <div><button class="btn" data-action="speak" data-word="${attr(w.word)}">🔊 發音</button> <button class="btn" data-action="toggle-fav" data-id="${w.id}">${p.fav?"★ 已收藏":"☆ 收藏"}</button></div></div>
    ${w.collocation?`<div class="example"><b>常見搭配</b><br>${esc(w.collocation)}</div>`:""}
-   ${ex.map(e=>`<div class="example"><b>${esc(e.english)}</b><br><span class="muted">${esc(e.chinese)}</span></div>`).join("")}
+   ${ex.map(e=>`<div class="example"><div class="row" style="align-items:flex-start"><b class="grow">${esc(e.english)}</b><button class="speak-mini" data-action="speak-text" data-text="${attr(e.english)}" title="播放例句">🔊</button></div><span class="muted">${esc(e.chinese)}</span></div>`).join("")}
    ${w.tips?.length?`<div class="example"><b>TOEIC 重點</b><ul style="padding-left:20px;margin-bottom:0">${w.tips.map(t=>`<li style="margin:7px 0">${esc(t)}</li>`).join("")}</ul></div>`:""}
    <div class="example"><b>學習狀態</b><br>Lv.${p.level} · 正確 ${p.correct} · 錯誤 ${p.wrong}</div>`;
   document.getElementById("modal").classList.remove("hidden");
 }
 function closeModal(){document.getElementById("modal").classList.add("hidden")}
 function toggleFav(id){const p=pstate(id);p.fav=!p.fav;saveProgress();openDetail(id)}
-function speak(t){try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);u.lang="en-US";u.rate=.9;speechSynthesis.speak(u)}catch(e){toast("此瀏覽器無法朗讀")}}
+function speak(t){
+  try{
+    if(!("speechSynthesis" in window)) throw new Error("unsupported");
+    speechSynthesis.cancel();
+    const u=new SpeechSynthesisUtterance(String(t||""));
+    u.lang="en-US";
+    u.rate=Number(settings.speechRate||.88);
+    const voices=speechSynthesis.getVoices?.()||[];
+    const preferred=voices.find(v=>/^en-US$/i.test(v.lang))||voices.find(v=>/^en/i.test(v.lang));
+    if(preferred)u.voice=preferred;
+    speechSynthesis.speak(u);
+  }catch(e){toast("此瀏覽器無法朗讀")}
+}
 function toast(t){const el=document.getElementById("toast");el.textContent=t;el.classList.remove("hidden");clearTimeout(toast.t);toast.t=setTimeout(()=>el.classList.add("hidden"),2200)}
 function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
 function attr(s){return esc(s)}
@@ -498,7 +483,7 @@ async function idbDel(k){try{const db=await idbOpen();return await new Promise((
 
 async function loadFull(){
   const btns=[...document.querySelectorAll('[data-action="load-full"]')];btns.forEach(b=>{b.disabled=true;b.innerHTML='<span class="loader"></span> 載入中'});
-  toast("正在下載並嚴格篩選字庫…");
+  toast("正在載入固定 Master 1200…");
   let lastErr=null;
   for(const url of FULL_URLS){
     try{
@@ -506,22 +491,32 @@ async function loadFull(){
       if(!r.ok)throw new Error("HTTP "+r.status);
       const raw=await r.json();
       const selected=select2000(raw);
-      words=selected;fullData=true;await idbSet(DATA_KEY,selected);toast("嚴格高分字庫載入完成");show(currentScreen==="settings"?"settings":"home");return;
+      words=selected;fullData=true;await idbSet(DATA_KEY,selected);toast("Master 1200 載入完成");show(currentScreen==="settings"?"settings":"home");return;
     }catch(e){lastErr=e}
   }
-  btns.forEach(b=>{b.disabled=false;b.textContent="載入嚴格高分字庫"});
+  btns.forEach(b=>{b.disabled=false;b.textContent="載入 Master 1200"});
   toast("下載被手機瀏覽器阻擋，可改用「匯入資料集 JSON」");
   if(currentScreen==="settings")renderSettings(); else renderHome();
 }
 async function importDatasetFile(file){
   try{
-    const raw=JSON.parse(await file.text());const selected=select2000(raw);words=selected;fullData=true;await idbSet(DATA_KEY,selected);toast("嚴格高分字庫匯入完成");show("home")
+    const raw=JSON.parse(await file.text());const selected=select2000(raw);words=selected;fullData=true;await idbSet(DATA_KEY,selected);toast("Master 1200 匯入完成");show("home")
   }catch(e){toast("資料集格式不正確")}
 }
 async function clearData(){await idbDel(DATA_KEY);words=BUILTIN.map((w,i)=>normalizeBuiltin(w,i));fullData=false;toast("已回到 50 字離線模式");show("settings")}
 function exportProgress(){
   const blob=new Blob([JSON.stringify({version:2,progress,settings,exportedAt:new Date().toISOString()},null,2)],{type:"application/json"});
   const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="toeic900-progress.json";a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)
+}
+function exportMasterList(){
+  const lines=["No.\tWord"];
+  MASTER_1200_WORDS.forEach((w,i)=>lines.push(`${i+1}\t${w}`));
+  const blob=new Blob([lines.join("\n")],{type:"text/plain;charset=utf-8"});
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(blob);
+  a.download="TOEIC825-900_Master1200.txt";
+  a.click();
+  setTimeout(()=>URL.revokeObjectURL(a.href),1000);
 }
 async function importProgressFile(file){try{const x=JSON.parse(await file.text());if(!x.progress)throw 0;progress=x.progress;if(x.settings)settings=Object.assign(settings,x.settings);saveProgress();saveSettings();applyTheme();toast("進度匯入完成");show("home")}catch(e){toast("進度檔格式不正確")}}
 function resetProgress(){if(confirm("確定要清除全部學習紀錄？此動作無法復原。")){progress={};saveProgress();toast("學習紀錄已清除");show("home")}}
@@ -553,6 +548,7 @@ document.addEventListener("click",e=>{
   else if(a==="cloze-next"){clozeState.i++;clozeState.answered=false;clozeState.answer=null;renderCloze()}
   else if(a==="word-detail")openDetail(b.dataset.id);
   else if(a==="speak"){e.stopPropagation();speak(b.dataset.word)}
+  else if(a==="speak-text"){e.stopPropagation();speak(b.dataset.text)}
   else if(a==="toggle-fav"){e.stopPropagation();toggleFav(b.dataset.id)}
   else if(a==="quick-review"){
     const due=priorityWords(words.filter(w=>progress[w.id]?.due&&progress[w.id].due<=now()));
@@ -572,6 +568,7 @@ document.addEventListener("click",e=>{
   else if(a==="import-dataset")document.getElementById("importDataset").click();
   else if(a==="clear-data")clearData();
   else if(a==="export-progress")exportProgress();
+  else if(a==="export-master-list")exportMasterList();
   else if(a==="import-progress")document.getElementById("importProgress").click();
   else if(a==="reset-progress")resetProgress();
 });
@@ -587,6 +584,7 @@ document.getElementById("importDataset").onchange=e=>{if(e.target.files[0])impor
   // Strict v3 migration: delete only the OLD word-cache database.
   // Learning progress is stored separately in localStorage and is preserved.
   try{indexedDB.deleteDatabase("toeic900_standalone_db")}catch(e){}
+  try{indexedDB.deleteDatabase("toeic900_strict825_v3")}catch(e){}
   // Critical for Android content:// pages:
   // render the built-in app FIRST. IndexedDB is optional background enhancement only.
   applyTheme();
@@ -595,9 +593,11 @@ document.getElementById("importDataset").onchange=e=>{if(e.target.files[0])impor
     idbGet(DATA_KEY),
     new Promise(resolve=>setTimeout(()=>resolve(null),1200))
   ]).then(cached=>{
-    if(Array.isArray(cached)&&cached.length>=50){
+    if(Array.isArray(cached)&&cached.length===1200){
       words=cached; fullData=true;
       if(currentScreen==="home"||currentScreen==="decks"||currentScreen==="settings") render(currentScreen);
+    }else if(location.protocol==="https:" && navigator.onLine){
+      setTimeout(()=>loadFull(),350);
     }
   }).catch(()=>{});
 })();

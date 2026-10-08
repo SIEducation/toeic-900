@@ -325,3 +325,20 @@ hr{border:0;border-top:1px solid var(--line);margin:14px 0}
   }
   .top-actions{flex:0 0 auto}
 }
+
+.speak-mini{
+  border:1px solid var(--line);
+  background:var(--surface);
+  color:var(--text);
+  width:34px;height:34px;border-radius:10px;
+  display:inline-flex;align-items:center;justify-content:center;
+  cursor:pointer;font-size:15px;line-height:1;
+}
+.speak-mini:hover{transform:translateY(-1px);box-shadow:0 5px 14px rgba(15,23,42,.08)}
+.voice-fab{
+  margin-top:14px;border:1px solid var(--line);background:var(--surface);
+  color:var(--text);border-radius:999px;padding:8px 13px;font-weight:750;cursor:pointer;
+}
+@media (max-width:899px){
+  .speak-mini{width:32px;height:32px;border-radius:9px}
+}

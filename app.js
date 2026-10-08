@@ -16,7 +16,7 @@ let currentScreen="home", currentDeck=1, currentMode=null;
 let flash=[], flashIndex=0, flashFlipped=false;
 let matchState=null, quizState=null, clozeState=null;
 let progress = loadJSON(K_PROGRESS,{});
-let settings = Object.assign({theme:"light",autoSpeak:false,flashDirection:"en-zh",speechRate:.88},loadJSON(K_SETTINGS,{}));
+let settings = Object.assign({theme:"light",autoSpeak:false,flashDirection:"en-zh",speechRate:.88,speechAccent:"us"},loadJSON(K_SETTINGS,{}));
 
 function normalizeBuiltin(w,i){
   return {
@@ -423,6 +423,7 @@ function renderSettings(){
       : (location.protocol==="https:" ? "若瀏覽器符合條件，可點右上角 ⇩ 安裝。" : "本機檔案只能預覽；要安裝請部署到 HTTPS 網址。")}</div>
     <div class="listrow"><div class="row"><div><b>翻卡方向</b><div class="small">英文→中文／中文→英文／隨機</div></div><select id="dirSel" class="btn"><option value="en-zh">英 → 中</option><option value="zh-en">中 → 英</option><option value="random">隨機</option></select></div></div>
     <div class="listrow"><div class="row"><div><b>自動發音</b><div class="small">翻到英文正面時自動朗讀</div></div><input id="autoSpeak" type="checkbox" ${settings.autoSpeak?"checked":""}></div></div>
+    <div class="listrow"><div class="row"><div><b>英文口音</b><div class="small">美式 en-US／英式 en-GB；實際聲音依你的裝置與瀏覽器可用語音</div></div><select id="speechAccentSel" class="btn"><option value="us">🇺🇸 美式 English (US)</option><option value="gb">🇬🇧 英式 English (UK)</option></select></div><div style="margin-top:8px"><button class="btn" data-action="test-voice">🔊 試聽目前口音</button></div></div>
     <div class="listrow"><div class="row"><div><b>語音速度</b><div class="small">單字與例句共用</div></div><select id="speechRateSel"><option value=".75">0.75×</option><option value=".88">0.88×</option><option value="1">1.00×</option><option value="1.1">1.10×</option></select></div></div>
   </div>
   <div class="card"><h3>字庫</h3><div class="data-status">${statusHTML()}</div><div class="notice" style="margin-top:10px"><b>Strict v3：</b>使用全新快取空間，不會讀取舊版含 bus / cash 的字庫。</div>
@@ -432,7 +433,7 @@ function renderSettings(){
   </div>
   <div class="card"><h3>學習紀錄</h3><div class="grid2"><button class="btn" data-action="export-progress">匯出進度</button><button class="btn" data-action="import-progress">匯入進度</button></div><div class="spacer8"></div><button class="btn bad block" data-action="reset-progress">清除全部學習紀錄</button></div>
   <div class="card"><h3>資料來源</h3><p class="small">字庫來源：kknono668/toeic-vocab-tw（CC BY-SA 4.0）。本版使用固定的 TOEIC 825→900 Master 1200 白名單；不再因資料集更新而改變 Part 內容。本工具非 ETS 官方產品。</p></div>`;
-  setTimeout(()=>{const d=document.getElementById("dirSel");if(d){d.value=settings.flashDirection;d.onchange=e=>{settings.flashDirection=e.target.value;saveSettings()}}const a=document.getElementById("autoSpeak");if(a)a.onchange=e=>{settings.autoSpeak=e.target.checked;saveSettings()};const sr=document.getElementById("speechRateSel");if(sr){sr.value=String(settings.speechRate??.88);sr.onchange=e=>{settings.speechRate=Number(e.target.value)||.88;saveSettings()}}},0);
+  setTimeout(()=>{const d=document.getElementById("dirSel");if(d){d.value=settings.flashDirection;d.onchange=e=>{settings.flashDirection=e.target.value;saveSettings()}}const a=document.getElementById("autoSpeak");if(a)a.onchange=e=>{settings.autoSpeak=e.target.checked;saveSettings()};const sa=document.getElementById("speechAccentSel");if(sa){sa.value=settings.speechAccent==="gb"?"gb":"us";sa.onchange=e=>{settings.speechAccent=e.target.value==="gb"?"gb":"us";saveSettings();toast(settings.speechAccent==="gb"?"已切換英式口音":"已切換美式口音")}}const sr=document.getElementById("speechRateSel");if(sr){sr.value=String(settings.speechRate??.88);sr.onchange=e=>{settings.speechRate=Number(e.target.value)||.88;saveSettings()}}},0);
 }
 function renderStats(){
   const s=globalStats(),levels=[0,0,0,0,0,0];words.forEach(w=>levels[Math.min(5,progress[w.id]?.level||0)]++);
@@ -460,10 +461,15 @@ function speak(t){
     if(!("speechSynthesis" in window)) throw new Error("unsupported");
     speechSynthesis.cancel();
     const u=new SpeechSynthesisUtterance(String(t||""));
-    u.lang="en-US";
+    const accent=settings.speechAccent==="gb"?"gb":"us";
+    const lang=accent==="gb"?"en-GB":"en-US";
+    u.lang=lang;
     u.rate=Number(settings.speechRate||.88);
     const voices=speechSynthesis.getVoices?.()||[];
-    const preferred=voices.find(v=>/^en-US$/i.test(v.lang))||voices.find(v=>/^en/i.test(v.lang));
+    const localeRe=accent==="gb"?/^en[-_](GB|UK)$/i:/^en[-_]US$/i;
+    const preferred=voices.find(v=>localeRe.test(String(v.lang||"")));
+    // Only pin a voice when it really matches the requested accent.
+    // Otherwise leave u.voice unset so the browser can resolve u.lang itself.
     if(preferred)u.voice=preferred;
     speechSynthesis.speak(u);
   }catch(e){toast("此瀏覽器無法朗讀")}
@@ -549,6 +555,7 @@ document.addEventListener("click",e=>{
   else if(a==="word-detail")openDetail(b.dataset.id);
   else if(a==="speak"){e.stopPropagation();speak(b.dataset.word)}
   else if(a==="speak-text"){e.stopPropagation();speak(b.dataset.text)}
+  else if(a==="test-voice"){e.stopPropagation();speak("The quarterly revenue exceeded our expectations.")}
   else if(a==="toggle-fav"){e.stopPropagation();toggleFav(b.dataset.id)}
   else if(a==="quick-review"){
     const due=priorityWords(words.filter(w=>progress[w.id]?.due&&progress[w.id].due<=now()));

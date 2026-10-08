@@ -14,6 +14,7 @@ let words = BUILTIN.map((w,i)=>normalizeBuiltin(w,i));
 let fullData = false;
 let currentScreen="home", currentDeck=1, currentMode=null;
 let flash=[], flashIndex=0, flashFlipped=false;
+let flashSwipeSuppressUntil=0;
 let matchState=null, quizState=null, clozeState=null;
 let progress = loadJSON(K_PROGRESS,{});
 let settings = Object.assign({theme:"light",autoSpeak:false,flashDirection:"en-zh",speechRate:.88,speechAccent:"us"},loadJSON(K_SETTINGS,{}));
@@ -253,11 +254,39 @@ function wordRow(w){
   </div>`;
 }
 function startFlash(list=deckWords(currentDeck)){
-  // If studying a normal 50-word deck, lead with core-gap words, then 900+, then quick-check words.
-  // Explicit tier-only lists preserve that tier but are still shuffled.
-  const tierSet=new Set(list.map(w=>w.tier));
-  flash=tierSet.size>1?priorityWords([...list]):shuffle([...list]);
+  // Flash cards now always follow the exact Part / filtered-list order.
+  // No random shuffle: Part 01 goes 1→50, Part 02 goes 51→100, etc.
+  flash=[...list];
   flashIndex=0;flashFlipped=false;currentMode="flash";show("flash");
+}
+function moveFlash(delta){
+  if(!flash.length)return;
+  const next=flashIndex+delta;
+  if(next<0){toast("已經是第一張");return}
+  if(next>flash.length)return;
+  flashIndex=next;
+  flashFlipped=false;
+  renderFlash();
+}
+function bindFlashSwipe(){
+  const el=document.getElementById("flashCard");
+  if(!el)return;
+  let startX=0,startY=0,tracking=false;
+  el.addEventListener("pointerdown",e=>{
+    if(e.pointerType==="mouse"&&e.button!==0)return;
+    startX=e.clientX;startY=e.clientY;tracking=true;
+    try{el.setPointerCapture(e.pointerId)}catch(_){}
+  });
+  el.addEventListener("pointerup",e=>{
+    if(!tracking)return;
+    tracking=false;
+    const dx=e.clientX-startX,dy=e.clientY-startY;
+    if(Math.abs(dx)>=48&&Math.abs(dx)>Math.abs(dy)*1.15){
+      flashSwipeSuppressUntil=Date.now()+450;
+      if(dx<0)moveFlash(1); else moveFlash(-1);
+    }
+  });
+  el.addEventListener("pointercancel",()=>{tracking=false});
 }
 function renderFlash(){
   if(!flash.length){document.getElementById("screen-flash").innerHTML=`<div class="card center"><h2>沒有可複習單字</h2><button class="btn" data-action="back-deck">返回</button></div>`;return}
@@ -276,12 +305,18 @@ function renderFlash(){
         ${w.tips?.[0]?`<div class="example"><b>TOEIC 重點</b><br>${esc(w.tips[0])}</div>`:""}
       </div>
     </div></div>
+    <div class="flash-nav">
+      <button class="btn" data-action="flash-prev" ${flashIndex===0?"disabled":""}>← 上一張</button>
+      <div class="small center grow">左右滑動即可切換，不必先評分</div>
+      <button class="btn" data-action="flash-next">${flashIndex===flash.length-1?"完成 →":"下一張 →"}</button>
+    </div>
     <div class="rating">
       <button class="btn bad" data-action="rate" data-rate="0">✕ 忘了</button>
       <button class="btn warn" data-action="rate" data-rate="1">△ 模糊</button>
       <button class="btn good" data-action="rate" data-rate="2">✓ 會了</button>
       <button class="btn primary" data-action="rate" data-rate="3">★ 很熟</button>
     </div>`;
+  bindFlashSwipe();
   if(settings.autoSpeak&&!flashFlipped&&dir==="en-zh") setTimeout(()=>speak(w.word),100);
 }
 function startMatch(list=deckWords(currentDeck)){
@@ -557,7 +592,9 @@ document.addEventListener("click",e=>{
   else if(a==="start-cloze-filtered"){const a2=filteredDeckWords(); if(a2.length)startCloze(a2);else toast("這個篩選沒有單字")}
   else if(a==="tier-filter"){activeTierFilter=b.dataset.tier;renderDeck()}
   else if(a==="category-filter"){activeCategoryFilter=b.dataset.category;renderDeck()}
-  else if(a==="flip"){flashFlipped=!flashFlipped;renderFlash()}
+  else if(a==="flip"){if(Date.now()<flashSwipeSuppressUntil)return;flashFlipped=!flashFlipped;renderFlash()}
+  else if(a==="flash-prev"){moveFlash(-1)}
+  else if(a==="flash-next"){moveFlash(1)}
   else if(a==="rate"){rateWord(flash[flashIndex],Number(b.dataset.rate));flashIndex++;flashFlipped=false;renderFlash()}
   else if(a==="start-match")startMatch();
   else if(a==="match-pick")pickMatch(Number(b.dataset.index));
@@ -573,9 +610,9 @@ document.addEventListener("click",e=>{
   else if(a==="test-voice"){e.stopPropagation();speak("The quarterly revenue exceeded our expectations.")}
   else if(a==="toggle-fav"){e.stopPropagation();toggleFav(b.dataset.id)}
   else if(a==="quick-review"){
-    const due=priorityWords(words.filter(w=>progress[w.id]?.due&&progress[w.id].due<=now()));
+    const due=words.filter(w=>progress[w.id]?.due&&progress[w.id].due<=now());
     const fallbackDeck=deckWords(Math.min(deckCount(),Math.max(1,Math.floor(globalStats().seen/50)+1)));
-    startFlash(due.length?due:priorityWords(fallbackDeck))
+    startFlash(due.length?due:fallbackDeck)
   }
   else if(a==="review-list")reviewList(b.dataset.kind);
   else if(a==="study-tier"){
@@ -603,6 +640,14 @@ document.getElementById("modalClose").onclick=closeModal;
 document.getElementById("modal").addEventListener("click",e=>{if(e.target.id==="modal")closeModal()});
 document.getElementById("importProgress").onchange=e=>{if(e.target.files[0])importProgressFile(e.target.files[0]);e.target.value=""};
 document.getElementById("importDataset").onchange=e=>{if(e.target.files[0])importDatasetFile(e.target.files[0]);e.target.value=""};
+window.addEventListener("keydown",e=>{
+  if(currentScreen!=="flash")return;
+  const tag=(document.activeElement?.tagName||"").toLowerCase();
+  if(tag==="input"||tag==="select"||tag==="textarea")return;
+  if(e.key==="ArrowRight"){e.preventDefault();moveFlash(1)}
+  else if(e.key==="ArrowLeft"){e.preventDefault();moveFlash(-1)}
+});
+
 
 (function init(){
   // Strict v3 migration: delete only the OLD word-cache database.

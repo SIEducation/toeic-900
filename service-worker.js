@@ -1,9 +1,9 @@
-const CACHE_NAME = "toeic900-master1200-v6-1-2-accent-visible";
+const CACHE_NAME = "toeic900-master1200-v6-1-3-ordered-swipe";
 const APP_SHELL = [
   "./",
   "./index.html",
-  "./style.css?v=6.1.2",
-  "./app.js?v=6.1.2",
+  "./style.css?v=6.1.3",
+  "./app.js?v=6.1.3",
   "./manifest.webmanifest",
   "./icon-192.png",
   "./icon-512.png"

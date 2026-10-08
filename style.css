@@ -342,3 +342,16 @@ hr{border:0;border-top:1px solid var(--line);margin:14px 0}
 @media (max-width:899px){
   .speak-mini{width:32px;height:32px;border-radius:9px}
 }
+
+
+/* v6.1.3: ordered flash cards + swipe navigation */
+.flashwrap{touch-action:pan-y;overscroll-behavior-x:contain}
+.flashcard{user-select:none;-webkit-user-select:none}
+.flash-nav{display:flex;align-items:center;gap:8px;margin:0 0 10px}
+.flash-nav .grow{flex:1;color:var(--muted)}
+.flash-nav button{min-width:94px}
+@media(max-width:560px){
+  .flash-nav{display:grid;grid-template-columns:1fr 1fr}
+  .flash-nav .grow{grid-column:1/-1;grid-row:1}
+  .flash-nav button{min-width:0}
+}

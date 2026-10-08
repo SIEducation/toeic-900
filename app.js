@@ -15,6 +15,7 @@ let fullData = false;
 let currentScreen="home", currentDeck=1, currentMode=null;
 let flash=[], flashIndex=0, flashFlipped=false;
 let flashSwipeSuppressUntil=0;
+let flashMotionBusy=false;
 let matchState=null, quizState=null, clozeState=null;
 let progress = loadJSON(K_PROGRESS,{});
 let settings = Object.assign({theme:"light",autoSpeak:false,flashDirection:"en-zh",speechRate:.88,speechAccent:"us"},loadJSON(K_SETTINGS,{}));
@@ -259,34 +260,102 @@ function startFlash(list=deckWords(currentDeck)){
   flash=[...list];
   flashIndex=0;flashFlipped=false;currentMode="flash";show("flash");
 }
+function flipFlash(){
+  if(Date.now()<flashSwipeSuppressUntil||flashMotionBusy)return;
+  flashFlipped=!flashFlipped;
+  const card=document.getElementById("flashCard");
+  if(card){
+    card.classList.toggle("flipped",flashFlipped);
+    card.setAttribute("aria-pressed",String(flashFlipped));
+  }
+}
+function animateFlashEntrance(delta){
+  const wrap=document.querySelector("#screen-flash .flashwrap");
+  if(!wrap)return;
+  wrap.classList.add(delta>0?"flash-enter-next":"flash-enter-prev");
+}
 function moveFlash(delta){
-  if(!flash.length)return;
+  if(!flash.length||flashMotionBusy)return;
   const next=flashIndex+delta;
   if(next<0){toast("已經是第一張");return}
   if(next>flash.length)return;
-  flashIndex=next;
-  flashFlipped=false;
-  renderFlash();
+
+  flashMotionBusy=true;
+  const wrap=document.querySelector("#screen-flash .flashwrap");
+  const exitClass=delta>0?"flash-exit-next":"flash-exit-prev";
+  if(wrap){
+    wrap.style.transform="";
+    wrap.style.opacity="";
+    wrap.classList.add(exitClass);
+  }
+
+  const finish=()=>{
+    flashIndex=next;
+    flashFlipped=false;
+    renderFlash();
+    animateFlashEntrance(delta);
+    window.setTimeout(()=>{flashMotionBusy=false},240);
+  };
+
+  if(wrap)window.setTimeout(finish,165);
+  else finish();
 }
 function bindFlashSwipe(){
   const el=document.getElementById("flashCard");
-  if(!el)return;
-  let startX=0,startY=0,tracking=false;
+  const wrap=el?.closest(".flashwrap");
+  if(!el||!wrap)return;
+  let startX=0,startY=0,lastX=0,tracking=false,dragging=false;
+
+  const resetDrag=()=>{
+    wrap.style.transition="transform .18s cubic-bezier(.2,.8,.2,1),opacity .18s ease";
+    wrap.style.transform="translate3d(0,0,0) rotate(0deg)";
+    wrap.style.opacity="1";
+    window.setTimeout(()=>{
+      wrap.style.transition="";
+      wrap.style.transform="";
+      wrap.style.opacity="";
+    },190);
+  };
+
   el.addEventListener("pointerdown",e=>{
-    if(e.pointerType==="mouse"&&e.button!==0)return;
-    startX=e.clientX;startY=e.clientY;tracking=true;
+    if(flashMotionBusy||(e.pointerType==="mouse"&&e.button!==0))return;
+    startX=lastX=e.clientX;startY=e.clientY;tracking=true;dragging=false;
+    wrap.classList.add("is-dragging");
     try{el.setPointerCapture(e.pointerId)}catch(_){}
   });
-  el.addEventListener("pointerup",e=>{
+
+  el.addEventListener("pointermove",e=>{
     if(!tracking)return;
-    tracking=false;
+    lastX=e.clientX;
     const dx=e.clientX-startX,dy=e.clientY-startY;
-    if(Math.abs(dx)>=48&&Math.abs(dx)>Math.abs(dy)*1.15){
-      flashSwipeSuppressUntil=Date.now()+450;
-      if(dx<0)moveFlash(1); else moveFlash(-1);
+    if(Math.abs(dx)>10&&Math.abs(dx)>Math.abs(dy)){
+      dragging=true;
+      const visual=dx*.34;
+      wrap.style.transition="none";
+      wrap.style.transform=`translate3d(${visual}px,0,0) rotate(${visual*.012}deg)`;
+      wrap.style.opacity=String(Math.max(.76,1-Math.abs(visual)/700));
     }
   });
-  el.addEventListener("pointercancel",()=>{tracking=false});
+
+  el.addEventListener("pointerup",e=>{
+    if(!tracking)return;
+    tracking=false;wrap.classList.remove("is-dragging");
+    const dx=(e.clientX||lastX)-startX,dy=e.clientY-startY;
+    if(dragging&&Math.abs(dx)>=48&&Math.abs(dx)>Math.abs(dy)*1.15){
+      flashSwipeSuppressUntil=Date.now()+450;
+      wrap.style.transition="";
+      wrap.style.transform="";
+      wrap.style.opacity="";
+      if(dx<0)moveFlash(1); else moveFlash(-1);
+    }else{
+      if(dragging)flashSwipeSuppressUntil=Date.now()+220;
+      resetDrag();
+    }
+  });
+
+  el.addEventListener("pointercancel",()=>{
+    tracking=false;dragging=false;wrap.classList.remove("is-dragging");resetDrag();
+  });
 }
 function renderFlash(){
   if(!flash.length){document.getElementById("screen-flash").innerHTML=`<div class="card center"><h2>沒有可複習單字</h2><button class="btn" data-action="back-deck">返回</button></div>`;return}
@@ -297,12 +366,17 @@ function renderFlash(){
   const ex=w.examples?.[0];
   document.getElementById("screen-flash").innerHTML=`
     <div class="row"><button class="btn" data-action="back-deck">‹ Part ${String(currentDeck).padStart(2,"0")}</button><div class="small">${flashIndex+1} / ${flash.length}</div></div>
-    <div class="flashwrap"><div class="flashcard ${flashFlipped?"flipped":""}" id="flashCard" data-action="flip">
+    <div class="flashwrap"><div class="flashcard ${flashFlipped?"flipped":""}" id="flashCard" data-action="flip" aria-pressed="${flashFlipped}">
       <div class="face front"><div class="${dir==="zh-en"?"bigzh":"bigword"}">${esc(front)}</div>${dir==="en-zh"?`<button class="voice-fab" data-action="speak" data-word="${attr(w.word)}" aria-label="播放發音">🔊 播放</button>`:""}<div class="muted" style="margin-top:10px">${esc(w.pos||"")}</div><div class="small" style="margin-top:30px">點一下翻面</div></div>
-      <div class="face back"><div class="${dir==="zh-en"?"bigword":"bigzh"}">${esc(backTitle)}</div>
-        <div class="badges"><span class="badge">${esc(w.pos||"")}</span><span class="badge">${esc(w.category||"")}</span><span class="badge">${esc(w.tier||"")}</span><button class="btn" style="padding:5px 8px" data-action="speak" data-word="${attr(w.word)}">🔊</button></div>
-        ${ex?`<div class="example"><div class="row" style="align-items:flex-start"><b class="grow">${esc(ex.english)}</b><button class="speak-mini" data-action="speak-text" data-text="${attr(ex.english)}" title="播放例句">🔊</button></div><span class="muted">${esc(ex.chinese)}</span></div>`:""}
-        ${w.tips?.[0]?`<div class="example"><b>TOEIC 重點</b><br>${esc(w.tips[0])}</div>`:""}
+      <div class="face back">
+        <div class="flash-back-head">
+          <div class="${dir==="zh-en"?"bigword":"bigzh"}">${esc(backTitle)}</div>
+          <div class="badges"><span class="badge">${esc(w.pos||"")}</span><span class="badge">${esc(w.category||"")}</span><span class="badge">${esc(w.tier||"")}</span><button class="btn" style="padding:5px 8px" data-action="speak" data-word="${attr(w.word)}">🔊</button></div>
+        </div>
+        <div class="flash-back-content">
+          ${ex?`<div class="example"><div class="row" style="align-items:flex-start"><b class="grow">${esc(ex.english)}</b><button class="speak-mini" data-action="speak-text" data-text="${attr(ex.english)}" title="播放例句">🔊</button></div><span class="muted">${esc(ex.chinese)}</span></div>`:""}
+          ${w.tips?.[0]?`<div class="example"><b>TOEIC 重點</b><br>${esc(w.tips[0])}</div>`:""}
+        </div>
       </div>
     </div></div>
     <div class="flash-nav">
@@ -487,9 +561,14 @@ function openDetail(id){
    ${ex.map(e=>`<div class="example"><div class="row" style="align-items:flex-start"><b class="grow">${esc(e.english)}</b><button class="speak-mini" data-action="speak-text" data-text="${attr(e.english)}" title="播放例句">🔊</button></div><span class="muted">${esc(e.chinese)}</span></div>`).join("")}
    ${w.tips?.length?`<div class="example"><b>TOEIC 重點</b><ul style="padding-left:20px;margin-bottom:0">${w.tips.map(t=>`<li style="margin:7px 0">${esc(t)}</li>`).join("")}</ul></div>`:""}
    <div class="example"><b>學習狀態</b><br>Lv.${p.level} · 正確 ${p.correct} · 錯誤 ${p.wrong}</div>`;
-  document.getElementById("modal").classList.remove("hidden");
+  document.getElementById("modal").classList.remove("closing","hidden");
 }
-function closeModal(){document.getElementById("modal").classList.add("hidden")}
+function closeModal(){
+  const m=document.getElementById("modal");
+  if(!m||m.classList.contains("hidden"))return;
+  m.classList.add("closing");
+  window.setTimeout(()=>{m.classList.add("hidden");m.classList.remove("closing")},180);
+}
 function toggleFav(id){const p=pstate(id);p.fav=!p.fav;saveProgress();openDetail(id)}
 function speak(t){
   try{
@@ -592,10 +671,10 @@ document.addEventListener("click",e=>{
   else if(a==="start-cloze-filtered"){const a2=filteredDeckWords(); if(a2.length)startCloze(a2);else toast("這個篩選沒有單字")}
   else if(a==="tier-filter"){activeTierFilter=b.dataset.tier;renderDeck()}
   else if(a==="category-filter"){activeCategoryFilter=b.dataset.category;renderDeck()}
-  else if(a==="flip"){if(Date.now()<flashSwipeSuppressUntil)return;flashFlipped=!flashFlipped;renderFlash()}
+  else if(a==="flip"){flipFlash()}
   else if(a==="flash-prev"){moveFlash(-1)}
   else if(a==="flash-next"){moveFlash(1)}
-  else if(a==="rate"){rateWord(flash[flashIndex],Number(b.dataset.rate));flashIndex++;flashFlipped=false;renderFlash()}
+  else if(a==="rate"){rateWord(flash[flashIndex],Number(b.dataset.rate));moveFlash(1)}
   else if(a==="start-match")startMatch();
   else if(a==="match-pick")pickMatch(Number(b.dataset.index));
   else if(a==="start-quiz")startQuiz();

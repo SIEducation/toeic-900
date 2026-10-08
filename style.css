@@ -238,8 +238,6 @@ hr{border:0;border-top:1px solid var(--line);margin:14px 0}
     box-shadow:inset 3px 0 0 #60a5fa;
   }
 
-  .screen.active{animation:desktopFade .16s ease-out}
-  @keyframes desktopFade{from{opacity:.5;transform:translateY(3px)}to{opacity:1;transform:none}}
 
   .card{padding:20px;margin-bottom:16px}
   .hero{padding:24px}
@@ -354,4 +352,131 @@ hr{border:0;border-top:1px solid var(--line);margin:14px 0}
   .flash-nav{display:grid;grid-template-columns:1fr 1fr}
   .flash-nav .grow{grid-column:1/-1;grid-row:1}
   .flash-nav button{min-width:0}
+}
+
+
+/* =========================================================
+   v6.1.4 — MOBILE CARD FIX + MOTION SYSTEM
+   ========================================================= */
+
+/* The back face must start at the TOP. Previously justify-content:center
+   could place overflowing content above the scroll origin on small phones. */
+.face.back{
+  justify-content:flex-start;
+  overflow-y:auto;
+  overflow-x:hidden;
+  overscroll-behavior:contain;
+  -webkit-overflow-scrolling:touch;
+  scroll-behavior:smooth;
+}
+.flash-back-head{
+  flex:0 0 auto;
+  position:sticky;
+  top:0;
+  z-index:3;
+  margin:-4px -4px 0;
+  padding:4px 4px 10px;
+  background:linear-gradient(180deg,var(--surface) 82%,color-mix(in srgb,var(--surface) 0%,transparent));
+}
+.flash-back-content{flex:0 0 auto;padding-bottom:6px}
+.face.back .bigword,.face.back .bigzh{flex:0 0 auto;margin-top:0}
+
+/* Real 3D flip: JS now toggles .flipped on the existing DOM node. */
+.flashcard{
+  transform-style:preserve-3d;
+  transition:transform .52s cubic-bezier(.2,.72,.2,1),filter .25s ease;
+  will-change:transform;
+}
+.face{
+  -webkit-backface-visibility:hidden;
+  backface-visibility:hidden;
+  transform:translateZ(0);
+}
+.face.front{transform:rotateY(0deg) translateZ(1px)}
+.face.back{transform:rotateY(180deg) translateZ(1px)}
+
+/* Card-to-card motion. */
+.flashwrap{
+  transform-origin:center center;
+  will-change:transform,opacity;
+}
+.flashwrap.is-dragging{filter:drop-shadow(0 18px 24px rgba(15,23,42,.08))}
+.flash-exit-next{animation:flashExitNext .165s cubic-bezier(.4,0,1,1) both}
+.flash-exit-prev{animation:flashExitPrev .165s cubic-bezier(.4,0,1,1) both}
+.flash-enter-next{animation:flashEnterNext .235s cubic-bezier(.18,.82,.22,1) both}
+.flash-enter-prev{animation:flashEnterPrev .235s cubic-bezier(.18,.82,.22,1) both}
+@keyframes flashExitNext{
+  to{opacity:0;transform:translate3d(-62px,0,0) rotate(-1.6deg) scale(.985)}
+}
+@keyframes flashExitPrev{
+  to{opacity:0;transform:translate3d(62px,0,0) rotate(1.6deg) scale(.985)}
+}
+@keyframes flashEnterNext{
+  from{opacity:0;transform:translate3d(62px,0,0) rotate(1.6deg) scale(.985)}
+  to{opacity:1;transform:none}
+}
+@keyframes flashEnterPrev{
+  from{opacity:0;transform:translate3d(-62px,0,0) rotate(-1.6deg) scale(.985)}
+  to{opacity:1;transform:none}
+}
+
+/* Route/page transitions now work on mobile too. */
+.screen.active{animation:screenIn .22s cubic-bezier(.2,.7,.2,1)}
+@keyframes screenIn{
+  from{opacity:0;transform:translateY(5px)}
+  to{opacity:1;transform:none}
+}
+
+/* Modal sheet + backdrop motion. */
+.modal:not(.hidden){animation:modalBackdropIn .18s ease both}
+.modal:not(.hidden) .modalcard{animation:modalSheetIn .24s cubic-bezier(.2,.75,.2,1) both}
+.modal.closing{animation:modalBackdropOut .18s ease both}
+.modal.closing .modalcard{animation:modalSheetOut .18s ease both}
+@keyframes modalBackdropIn{from{background:rgba(2,6,23,0)}to{background:rgba(2,6,23,.58)}}
+@keyframes modalBackdropOut{from{background:rgba(2,6,23,.58)}to{background:rgba(2,6,23,0)}}
+@keyframes modalSheetIn{from{opacity:0;transform:translateY(22px) scale(.985)}to{opacity:1;transform:none}}
+@keyframes modalSheetOut{to{opacity:0;transform:translateY(16px) scale(.99)}}
+
+/* Toast / result feedback / controls. */
+.toast:not(.hidden){animation:toastIn .2s cubic-bezier(.2,.8,.2,1) both}
+@keyframes toastIn{from{opacity:0;transform:translate(-50%,10px) scale(.96)}to{opacity:1;transform:translate(-50%,0) scale(1)}}
+.btn,.iconbtn,.deckcard,.option,.matchbtn,.speak-mini,.voice-fab,.badge{
+  transition:transform .14s ease,box-shadow .18s ease,background-color .18s ease,border-color .18s ease,color .18s ease,opacity .18s ease;
+}
+.btn:active:not(:disabled),.iconbtn:active,.deckcard:active,.option:active:not(:disabled),.matchbtn:active:not(.done),.speak-mini:active,.voice-fab:active{
+  transform:scale(.97);
+}
+.matchbtn.sel{animation:matchSelect .18s ease}
+.matchbtn.done{transition:opacity .22s ease,transform .22s ease;transform:scale(.96)}
+@keyframes matchSelect{50%{transform:scale(1.035)}}
+.option.correct{animation:answerCorrect .28s ease}
+.option.wrong{animation:answerWrong .3s ease}
+@keyframes answerCorrect{50%{transform:scale(1.015)}}
+@keyframes answerWrong{25%{transform:translateX(-4px)}50%{transform:translateX(4px)}75%{transform:translateX(-2px)}}
+
+/* Mobile sizing: preserve the top of the card and allow the back to scroll naturally. */
+@media(max-width:560px){
+  #screen-flash.active{overflow:visible}
+  .flashwrap{margin-top:10px}
+  .flashcard{
+    height:clamp(365px,56svh,430px);
+    min-height:365px;
+  }
+  .face{padding:20px 18px}
+  .face.back{padding-top:18px;padding-bottom:20px}
+  .face.front{justify-content:center}
+  .flash-back-head{margin:-2px -2px 0;padding:2px 2px 9px}
+  .face.back .bigword{font-size:31px;line-height:1.08}
+  .face.back .bigzh{font-size:23px;line-height:1.18}
+  .face.back .example{margin-top:10px}
+}
+
+/* Respect users who disable motion at OS level. */
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{
+    animation-duration:.001ms!important;
+    animation-iteration-count:1!important;
+    transition-duration:.001ms!important;
+    scroll-behavior:auto!important;
+  }
 }

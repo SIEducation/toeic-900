@@ -8,16 +8,19 @@ const FULL_URLS = [
 ];
 const K_PROGRESS="toeic900_standalone_progress_v2";
 const K_SETTINGS="toeic900_standalone_settings_v2";
+const K_FLASH_SESSIONS="toeic900_flash_sessions_v1";
 const DB_NAME="toeic900_master1200_v6", STORE="kv", DATA_KEY="master1200_words_v1";
 
 let words = BUILTIN.map((w,i)=>normalizeBuiltin(w,i));
 let fullData = false;
 let currentScreen="home", currentDeck=1, currentMode=null;
-let flash=[], flashIndex=0, flashFlipped=false;
+let flash=[], flashOriginal=[], flashIndex=0, flashFlipped=false;
+let flashSessionKey="";
 let flashSwipeSuppressUntil=0;
 let flashMotionBusy=false;
 let matchState=null, quizState=null, clozeState=null;
 let progress = loadJSON(K_PROGRESS,{});
+let flashSessions = loadJSON(K_FLASH_SESSIONS,{});
 let settings = Object.assign({theme:"light",autoSpeak:false,flashDirection:"en-zh",speechRate:.88,speechAccent:"us"},loadJSON(K_SETTINGS,{}));
 
 function normalizeBuiltin(w,i){
@@ -254,11 +257,104 @@ function wordRow(w){
     <div class="badges"><span class="badge">${esc(w.pos||"")}</span><button class="badge" style="color:inherit" data-action="category-filter" data-category="${attr(w.category||"")}">${esc(w.category||"")}</button><button class="badge" style="color:inherit" data-action="tier-filter" data-tier="${attr(w.tier||"825→900 核心缺口")}">${esc(w.tier||"825→900 核心缺口")}</button>${w.star?`<span class="badge">${"★".repeat(Math.min(5,w.star))}</span>`:""}</div>
   </div>`;
 }
+function saveFlashSessions(){try{localStorage.setItem(K_FLASH_SESSIONS,JSON.stringify(flashSessions))}catch(e){}}
+function flashKeyFor(list){
+  const ids=(list||[]).map(w=>w.id).join("|");
+  return `part_${currentDeck}_${hash(ids)}`;
+}
+function sameIds(a,b){
+  return Array.isArray(a)&&Array.isArray(b)&&a.length===b.length&&a.every((x,i)=>x===b[i]);
+}
+function persistFlashSession(completed=false){
+  if(!flashSessionKey||!flashOriginal.length)return;
+  flashSessions[flashSessionKey]={
+    originalIds:flashOriginal.map(w=>w.id),
+    remainingIds:flash.map(w=>w.id),
+    currentId:flash[flashIndex]?.id||null,
+    completed:Boolean(completed),
+    updatedAt:Date.now()
+  };
+  saveFlashSessions();
+}
 function startFlash(list=deckWords(currentDeck)){
-  // Flash cards now always follow the exact Part / filtered-list order.
-  // No random shuffle: Part 01 goes 1→50, Part 02 goes 51→100, etc.
-  flash=[...list];
-  flashIndex=0;flashFlipped=false;currentMode="flash";show("flash");
+  // Fixed order + persistent mastery queue. Re-entering this Part resumes the
+  // exact remaining-card queue and the card the learner last reached.
+  flashOriginal=[...list];
+  flashSessionKey=flashKeyFor(flashOriginal);
+  const originalIds=flashOriginal.map(w=>w.id);
+  const byId=new Map(flashOriginal.map(w=>[w.id,w]));
+  let session=flashSessions[flashSessionKey];
+
+  if(!session||!sameIds(session.originalIds,originalIds)){
+    session={originalIds:[...originalIds],remainingIds:[...originalIds],currentId:originalIds[0]||null,completed:false,updatedAt:Date.now()};
+    flashSessions[flashSessionKey]=session;
+    saveFlashSessions();
+  }
+
+  if(session.completed){
+    flash=[];
+    flashIndex=0;
+  }else{
+    flash=(session.remainingIds||[]).map(id=>byId.get(id)).filter(Boolean);
+    // Recover gracefully if stored IDs became stale.
+    if(!flash.length&&originalIds.length){
+      flash=[...flashOriginal];
+      session.remainingIds=[...originalIds];
+      session.currentId=originalIds[0];
+      session.completed=false;
+    }
+    const savedIndex=flash.findIndex(w=>w.id===session.currentId);
+    flashIndex=savedIndex>=0?savedIndex:0;
+  }
+  flashFlipped=false;
+  currentMode="flash";
+  persistFlashSession(Boolean(session.completed));
+  show("flash");
+}
+function resetFlashSession(){
+  if(!flashOriginal.length)return;
+  if(!confirm("確定要重置這一輪嗎？已經按『學會了』而消失的卡牌會全部回來。"))return;
+  flash=[...flashOriginal];
+  flashIndex=0;
+  flashFlipped=false;
+  flashMotionBusy=false;
+  persistFlashSession(false);
+  renderFlash();
+  animateFlashEntrance(1);
+  toast("本輪已重置，全部卡牌已恢復");
+}
+function learnFlashCurrent(){
+  if(!flash.length||flashMotionBusy)return;
+  const w=flash[flashIndex];
+  if(!w)return;
+  flashMotionBusy=true;
+  const wrap=document.querySelector("#screen-flash .flashwrap");
+  if(wrap)wrap.classList.add("flash-learn-out");
+
+  const finish=()=>{
+    // "學會了" also feeds the existing global learning statistics.
+    rateWord(w,3);
+    flash.splice(flashIndex,1);
+    flashFlipped=false;
+
+    if(!flash.length){
+      flashIndex=0;
+      persistFlashSession(true);
+      renderFlash();
+      flashMotionBusy=false;
+      return;
+    }
+
+    // Stay on the logical next unresolved card; if the removed card was the
+    // last one, wrap to the first unresolved card instead of declaring done.
+    if(flashIndex>=flash.length)flashIndex=0;
+    persistFlashSession(false);
+    renderFlash();
+    animateFlashEntrance(1);
+    window.setTimeout(()=>{flashMotionBusy=false},240);
+  };
+
+  if(wrap)window.setTimeout(finish,210); else finish();
 }
 function flipFlash(){
   if(Date.now()<flashSwipeSuppressUntil||flashMotionBusy)return;
@@ -276,9 +372,9 @@ function animateFlashEntrance(delta){
 }
 function moveFlash(delta){
   if(!flash.length||flashMotionBusy)return;
-  const next=flashIndex+delta;
-  if(next<0){toast("已經是第一張");return}
-  if(next>flash.length)return;
+  if(flash.length===1){toast("只剩最後 1 張，學會後按『學會了』");return}
+  // Remaining cards form a loop: swiping past either edge wraps around.
+  const next=(flashIndex+delta+flash.length)%flash.length;
 
   flashMotionBusy=true;
   const wrap=document.querySelector("#screen-flash .flashwrap");
@@ -292,6 +388,7 @@ function moveFlash(delta){
   const finish=()=>{
     flashIndex=next;
     flashFlipped=false;
+    persistFlashSession(false);
     renderFlash();
     animateFlashEntrance(delta);
     window.setTimeout(()=>{flashMotionBusy=false},240);
@@ -358,14 +455,36 @@ function bindFlashSwipe(){
   });
 }
 function renderFlash(){
-  if(!flash.length){document.getElementById("screen-flash").innerHTML=`<div class="card center"><h2>沒有可複習單字</h2><button class="btn" data-action="back-deck">返回</button></div>`;return}
-  if(flashIndex>=flash.length){document.getElementById("screen-flash").innerHTML=`<div class="card center"><div style="font-size:46px">🎉</div><h2>完成這一輪</h2><p class="muted">${flash.length} 張卡片已看完。</p><button class="btn primary block" data-action="start-flash">再練一次</button><div class="spacer8"></div><button class="btn block" data-action="back-deck">回單字夾</button></div>`;return}
+  const total=flashOriginal.length||flash.length;
+  if(!total){
+    document.getElementById("screen-flash").innerHTML=`<div class="card center"><h2>沒有可複習單字</h2><button class="btn" data-action="back-deck">返回</button></div>`;
+    return;
+  }
+  if(!flash.length){
+    document.getElementById("screen-flash").innerHTML=`
+      <div class="card center flash-complete-card">
+        <div class="complete-burst">🎉</div>
+        <h2>學習完成</h2>
+        <p class="muted">這一組 ${total} 張卡牌都已經按下「學會了」。</p>
+        <div class="flash-complete-progress"><b>${total} / ${total}</b><span>全部完成</span></div>
+        <button class="btn primary block" data-action="flash-reset">↺ 重置本輪</button>
+        <div class="spacer8"></div>
+        <button class="btn block" data-action="back-deck">回單字夾</button>
+      </div>`;
+    return;
+  }
+
   const w=flash[flashIndex], dir=settings.flashDirection==="random"?(Math.random()<.5?"en-zh":"zh-en"):settings.flashDirection;
   const front=dir==="zh-en"?w.zh:w.word;
   const backTitle=dir==="zh-en"?w.word:w.zh;
   const ex=w.examples?.[0];
+  const learned=total-flash.length;
+  const pct=total?Math.round(learned/total*100):0;
+
   document.getElementById("screen-flash").innerHTML=`
-    <div class="row"><button class="btn" data-action="back-deck">‹ Part ${String(currentDeck).padStart(2,"0")}</button><div class="small">${flashIndex+1} / ${flash.length}</div></div>
+    <div class="row"><button class="btn" data-action="back-deck">‹ Part ${String(currentDeck).padStart(2,"0")}</button><div class="small">剩餘 ${flash.length} / ${total}</div></div>
+    <div class="flash-session-progress" aria-label="本輪學習進度"><i style="width:${pct}%"></i></div>
+    <div class="flash-session-meta"><span>已學會 ${learned}</span><span>目前 ${flashIndex+1} / ${flash.length}</span></div>
     <div class="flashwrap"><div class="flashcard ${flashFlipped?"flipped":""}" id="flashCard" data-action="flip" aria-pressed="${flashFlipped}">
       <div class="face front"><div class="${dir==="zh-en"?"bigzh":"bigword"}">${esc(front)}</div>${dir==="en-zh"?`<button class="voice-fab" data-action="speak" data-word="${attr(w.word)}" aria-label="播放發音">🔊 播放</button>`:""}<div class="muted" style="margin-top:10px">${esc(w.pos||"")}</div><div class="small" style="margin-top:30px">點一下翻面</div></div>
       <div class="face back">
@@ -379,16 +498,10 @@ function renderFlash(){
         </div>
       </div>
     </div></div>
-    <div class="flash-nav">
-      <button class="btn" data-action="flash-prev" ${flashIndex===0?"disabled":""}>← 上一張</button>
-      <div class="small center grow">左右滑動即可切換，不必先評分</div>
-      <button class="btn" data-action="flash-next">${flashIndex===flash.length-1?"完成 →":"下一張 →"}</button>
-    </div>
-    <div class="rating">
-      <button class="btn bad" data-action="rate" data-rate="0">✕ 忘了</button>
-      <button class="btn warn" data-action="rate" data-rate="1">△ 模糊</button>
-      <button class="btn good" data-action="rate" data-rate="2">✓ 會了</button>
-      <button class="btn primary" data-action="rate" data-rate="3">★ 很熟</button>
+    <div class="flash-swipe-hint">← 右滑上一張　·　左滑下一張 →</div>
+    <div class="flash-master-actions">
+      <button class="btn flash-reset-btn" data-action="flash-reset">↺ 重置本輪</button>
+      <button class="btn primary flash-learn-btn" data-action="flash-learn">✓ 學會了</button>
     </div>`;
   bindFlashSwipe();
   if(settings.autoSpeak&&!flashFlipped&&dir==="en-zh") setTimeout(()=>speak(w.word),100);
@@ -625,7 +738,7 @@ async function importDatasetFile(file){
 }
 async function clearData(){await idbDel(DATA_KEY);words=BUILTIN.map((w,i)=>normalizeBuiltin(w,i));fullData=false;toast("已回到 50 字離線模式");show("settings")}
 function exportProgress(){
-  const blob=new Blob([JSON.stringify({version:2,progress,settings,exportedAt:new Date().toISOString()},null,2)],{type:"application/json"});
+  const blob=new Blob([JSON.stringify({version:3,progress,settings,flashSessions,exportedAt:new Date().toISOString()},null,2)],{type:"application/json"});
   const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="toeic900-progress.json";a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)
 }
 function exportMasterList(){
@@ -638,8 +751,8 @@ function exportMasterList(){
   a.click();
   setTimeout(()=>URL.revokeObjectURL(a.href),1000);
 }
-async function importProgressFile(file){try{const x=JSON.parse(await file.text());if(!x.progress)throw 0;progress=x.progress;if(x.settings)settings=Object.assign(settings,x.settings);saveProgress();saveSettings();applyTheme();toast("進度匯入完成");show("home")}catch(e){toast("進度檔格式不正確")}}
-function resetProgress(){if(confirm("確定要清除全部學習紀錄？此動作無法復原。")){progress={};saveProgress();toast("學習紀錄已清除");show("home")}}
+async function importProgressFile(file){try{const x=JSON.parse(await file.text());if(!x.progress)throw 0;progress=x.progress;if(x.settings)settings=Object.assign(settings,x.settings);if(x.flashSessions&&typeof x.flashSessions==="object")flashSessions=x.flashSessions;saveProgress();saveSettings();saveFlashSessions();applyTheme();toast("進度匯入完成");show("home")}catch(e){toast("進度檔格式不正確")}}
+function resetProgress(){if(confirm("確定要清除全部學習紀錄？此動作無法復原。")){progress={};flashSessions={};saveProgress();saveFlashSessions();toast("學習紀錄已清除");show("home")}}
 function applyTheme(){document.documentElement.dataset.theme=settings.theme}
 function toggleTheme(){settings.theme=settings.theme==="dark"?"light":"dark";saveSettings();applyTheme()}
 function updateAccentButton(){
@@ -663,7 +776,7 @@ document.addEventListener("click",e=>{
   const a=b.dataset.action;
   if(a==="open-deck"){currentDeck=Number(b.dataset.deck)||1;resetDeckFilters();show("deck")}
   else if(a==="open-decks"||a==="back-decks")show("decks");
-  else if(a==="back-deck")show("deck");
+  else if(a==="back-deck"){if(currentScreen==="flash"&&flash.length)persistFlashSession(false);show("deck")}
   else if(a==="start-flash")startFlash();
   else if(a==="start-flash-filtered"){const a2=filteredDeckWords(); if(a2.length)startFlash(a2);else toast("這個篩選沒有單字")}
   else if(a==="start-match-filtered"){const a2=filteredDeckWords(); if(a2.length>=2)startMatch(a2);else toast("至少需要 2 個單字")}
@@ -672,9 +785,8 @@ document.addEventListener("click",e=>{
   else if(a==="tier-filter"){activeTierFilter=b.dataset.tier;renderDeck()}
   else if(a==="category-filter"){activeCategoryFilter=b.dataset.category;renderDeck()}
   else if(a==="flip"){flipFlash()}
-  else if(a==="flash-prev"){moveFlash(-1)}
-  else if(a==="flash-next"){moveFlash(1)}
-  else if(a==="rate"){rateWord(flash[flashIndex],Number(b.dataset.rate));moveFlash(1)}
+  else if(a==="flash-learn"){learnFlashCurrent()}
+  else if(a==="flash-reset"){resetFlashSession()}
   else if(a==="start-match")startMatch();
   else if(a==="match-pick")pickMatch(Number(b.dataset.index));
   else if(a==="start-quiz")startQuiz();
@@ -727,6 +839,373 @@ window.addEventListener("keydown",e=>{
   else if(e.key==="ArrowLeft"){e.preventDefault();moveFlash(-1)}
 });
 
+
+
+
+// ================================================================
+// v7.0 — SMART LEARNING SYSTEM
+// Keeps the fixed Master 1200 and all legacy study modes intact.
+// Adds adaptive active-recall sessions, daily planning, persistent
+// study state, richer review analytics, and written recall.
+// ================================================================
+const APP_VERSION="7.0";
+const K_ACTIVITY_V7="toeic900_activity_v7";
+const K_SMART_SESSION_V7="toeic900_smart_session_v7";
+let activityV7=loadJSON(K_ACTIVITY_V7,{days:{}});
+if(!activityV7||typeof activityV7!=="object")activityV7={days:{}};
+if(!activityV7.days||typeof activityV7.days!=="object")activityV7.days={};
+let smartSessionV7=loadJSON(K_SMART_SESSION_V7,null);
+let smartFeedbackV7=null;
+let smartHintV7=false;
+let writeStateV7=null;
+settings=Object.assign({dailyGoal:20,smartSize:20},settings||{});
+
+function localDayKeyV7(ts=Date.now()){
+  const d=new Date(ts);
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+}
+function dayRecordV7(key=localDayKeyV7()){
+  if(!activityV7.days[key])activityV7.days[key]={words:[],answers:0,correct:0,wrong:0,learned:0};
+  const d=activityV7.days[key];
+  if(!Array.isArray(d.words))d.words=[];
+  return d;
+}
+function saveActivityV7(){try{localStorage.setItem(K_ACTIVITY_V7,JSON.stringify(activityV7))}catch(e){}}
+function logActivityV7(w,ok,learned=false){
+  const d=dayRecordV7();
+  if(w?.id&&!d.words.includes(w.id))d.words.push(w.id);
+  d.answers=(d.answers||0)+1;
+  if(ok===true)d.correct=(d.correct||0)+1;
+  if(ok===false)d.wrong=(d.wrong||0)+1;
+  if(learned)d.learned=(d.learned||0)+1;
+  saveActivityV7();
+}
+function activityStreakV7(){
+  const today=new Date();
+  let cursor=new Date(today.getFullYear(),today.getMonth(),today.getDate());
+  // A streak remains alive during the current day even before today's study.
+  if(!(activityV7.days[localDayKeyV7(cursor.getTime())]?.words||[]).length)cursor.setDate(cursor.getDate()-1);
+  let n=0;
+  for(let i=0;i<1000;i++){
+    const rec=activityV7.days[localDayKeyV7(cursor.getTime())];
+    if(!rec||(rec.words||[]).length===0)break;
+    n++;cursor.setDate(cursor.getDate()-1);
+  }
+  return n;
+}
+function last7DaysV7(){
+  const out=[];
+  const base=new Date();base.setHours(0,0,0,0);
+  for(let i=6;i>=0;i--){
+    const d=new Date(base);d.setDate(d.getDate()-i);
+    const key=localDayKeyV7(d.getTime()),r=activityV7.days[key]||{};
+    out.push({key,label:["日","一","二","三","四","五","六"][d.getDay()],count:(r.words||[]).length,answers:r.answers||0});
+  }
+  return out;
+}
+function saveSmartSessionV7(){
+  try{
+    if(smartSessionV7)localStorage.setItem(K_SMART_SESSION_V7,JSON.stringify(smartSessionV7));
+    else localStorage.removeItem(K_SMART_SESSION_V7);
+  }catch(e){}
+}
+
+// Backward-compatible progress model with a few extra memory signals.
+function pstate(id){
+  const base={seen:0,level:0,correct:0,wrong:0,last:0,due:0,interval:0,fav:false,streak:0,lapses:0,lastResult:null};
+  if(!progress[id])progress[id]={...base};
+  else for(const [k,v] of Object.entries(base))if(progress[id][k]===undefined)progress[id][k]=v;
+  return progress[id];
+}
+function scheduleRecallV7(w,ok,{log=true,learned=false}={}){
+  const p=pstate(w.id);p.seen=(p.seen||0)+1;p.last=now();p.lastResult=ok?"correct":"wrong";
+  if(ok){
+    p.correct=(p.correct||0)+1;p.streak=(p.streak||0)+1;
+    if((p.level||0)===0)p.level=1;
+    else if(p.streak>=2)p.level=Math.min(5,(p.level||0)+1);
+    const base=[0,1,3,7,14,30][Math.min(5,p.level||0)]||1;
+    p.interval=Math.max(base,Math.min(90,Math.round((p.interval||0)*1.65)||base));
+  }else{
+    p.wrong=(p.wrong||0)+1;p.lapses=(p.lapses||0)+1;p.streak=0;p.level=Math.max(0,(p.level||0)-1);p.interval=.007;
+  }
+  p.due=now()+p.interval*86400000;
+  saveProgress();
+  if(log)logActivityV7(w,ok,learned);
+  return p;
+}
+function rateWord(w,r){
+  const p=pstate(w.id);p.seen=(p.seen||0)+1;p.last=now();
+  if(r===0){p.wrong++;p.lapses++;p.streak=0;p.level=Math.max(0,p.level-1);p.interval=.007;p.lastResult="wrong";logActivityV7(w,false,false)}
+  if(r===1){p.level=Math.max(1,p.level);p.interval=Math.max(1,p.interval||1);p.lastResult="hard";logActivityV7(w,null,false)}
+  if(r===2){p.correct++;p.streak++;p.level=Math.max(2,p.level);p.interval=Math.max(3,Math.round((p.interval||1)*1.7));p.lastResult="correct";logActivityV7(w,true,false)}
+  if(r===3){p.correct++;p.streak++;p.level=Math.min(5,Math.max(3,p.level+1));p.interval=Math.max(7,Math.round((p.interval||3)*2));p.lastResult="correct";logActivityV7(w,true,true)}
+  p.due=now()+p.interval*86400000;saveProgress();
+}
+function quizResult(w,ok){scheduleRecallV7(w,ok,{log:true,learned:false})}
+function markSeen(w){const p=pstate(w.id);if(!p.seen){p.seen=1;p.last=now();saveProgress()}}
+function isWeakV7(p){return !!(p?.seen&&(((p.wrong||0)>(p.correct||0))||((p.level||0)<=1&&(p.wrong||0)>0)))}
+function isLeechV7(p){return !!(p?.seen&&((p.lapses||p.wrong||0)>=4)&&(p.wrong||0)>=(p.correct||0))}
+function dueTextV7(p){
+  if(!p?.due)return "尚未排程";
+  const ms=p.due-now();if(ms<=0)return "現在到期";
+  const h=Math.ceil(ms/3600000);if(h<24)return `${h} 小時後`;
+  const d=Math.ceil(ms/86400000);return `${d} 天後`;
+}
+function globalStats(){
+  let seen=0,mastered=0,weak=0,due=0,fav=0,leech=0,correct=0,wrong=0;
+  words.forEach(w=>{const p=progress[w.id];if(!p)return;if(p.seen)seen++;if((p.level||0)>=4)mastered++;if(isWeakV7(p))weak++;if(p.due&&p.due<=now())due++;if(p.fav)fav++;if(isLeechV7(p))leech++;correct+=p.correct||0;wrong+=p.wrong||0});
+  return {seen,mastered,weak,due,fav,leech,unseen:Math.max(0,words.length-seen),accuracy:(correct+wrong)?Math.round(correct/(correct+wrong)*100):0};
+}
+function flashSessionForDeckV7(n){
+  const list=deckWords(n),ids=list.map(w=>w.id),key=`part_${n}_${hash(ids.join("|"))}`;
+  return flashSessions[key]||null;
+}
+function deckStats(n){
+  const dw=deckWords(n);let seen=0,mastered=0,due=0,weak=0;
+  dw.forEach(w=>{const p=progress[w.id];if(p?.seen)seen++;if((p?.level||0)>=4)mastered++;if(p?.due&&p.due<=now())due++;if(isWeakV7(p))weak++});
+  const fs=flashSessionForDeckV7(n);const flashRemaining=fs&&!fs.completed?(fs.remainingIds||[]).length:0;
+  return {seen,mastered,due,weak,flashRemaining,total:dw.length,pct:dw.length?Math.round(mastered/dw.length*100):0,seenPct:dw.length?Math.round(seen/dw.length*100):0};
+}
+function recommendedDeckV7(){
+  for(let i=1;i<=deckCount();i++)if(deckStats(i).mastered<deckStats(i).total)return i;
+  return 1;
+}
+function todayPlanV7(){
+  const s=globalStats(),today=dayRecordV7(),goal=Math.max(5,Number(settings.dailyGoal)||20);
+  return {s,today,goal,done:(today.words||[]).length,pct:Math.min(100,Math.round(((today.words||[]).length/goal)*100)),streak:activityStreakV7()};
+}
+
+function uniqueWordsV7(a){const seen=new Set();return a.filter(w=>w&&!seen.has(w.id)&&seen.add(w.id))}
+function smartCandidatesV7(base=words,size=Number(settings.smartSize)||20){
+  const due=base.filter(w=>progress[w.id]?.due&&progress[w.id].due<=now());
+  const weak=base.filter(w=>isWeakV7(progress[w.id])&&!due.some(x=>x.id===w.id));
+  const unseen=base.filter(w=>!progress[w.id]?.seen);
+  const rest=[...base].sort((a,b)=>(progress[a.id]?.last||0)-(progress[b.id]?.last||0));
+  return uniqueWordsV7([...due,...weak,...unseen,...rest]).slice(0,Math.max(5,size));
+}
+function smartSessionUsableV7(){
+  if(!smartSessionV7||smartSessionV7.completed||!Array.isArray(smartSessionV7.queue)||!smartSessionV7.queue.length)return false;
+  // During the first second of an online launch, the app may still be showing the
+  // 50-word built-in fallback while the cached/full Master 1200 is loading. Do
+  // not incorrectly hide or erase a valid full-data session during that window.
+  if(!fullData&&words.length<1200)return true;
+  const ids=new Set(words.map(w=>w.id));return smartSessionV7.queue.some(id=>ids.has(id));
+}
+function startSmartLearnV7(base=null,label="全字庫智慧學習"){
+  const list=smartCandidatesV7(base||words,Number(settings.smartSize)||20);
+  if(!list.length){toast("目前沒有可練習單字");return}
+  const items={};list.forEach(w=>items[w.id]={hits:0,misses:0});
+  smartSessionV7={version:1,label,originalIds:list.map(w=>w.id),queue:list.map(w=>w.id),items,startedAt:Date.now(),updatedAt:Date.now(),stats:{answers:0,correct:0,wrong:0,mastered:0},completed:false};
+  smartFeedbackV7=null;smartHintV7=false;saveSmartSessionV7();show("learn");
+}
+function resumeSmartLearnV7(){
+  if(!smartSessionV7||smartSessionV7.completed||!smartSessionV7.queue?.length){startSmartLearnV7();return}
+  const ids=new Set(words.map(w=>w.id));
+  if(!smartSessionV7.queue.some(id=>ids.has(id))){
+    if(!fullData&&words.length<1200){toast("Master 1200 正在載入，稍後即可續接進度");return}
+    smartSessionV7=null;saveSmartSessionV7();startSmartLearnV7();return;
+  }
+  smartFeedbackV7=null;smartHintV7=false;show("learn");
+}
+function smartCurrentV7(){
+  const id=smartSessionV7?.queue?.[0];return id?words.find(w=>w.id===id):null;
+}
+function smartModeV7(w,item){
+  const p=progress[w.id]||{};
+  if((item.hits||0)===0&&((p.level||0)<2||(item.misses||0)>0))return "choice";
+  return "write";
+}
+function smartDistractorsV7(w){
+  const same=words.filter(x=>x.id!==w.id&&x.zh!==w.zh&&x.category===w.category);
+  const pool=uniqueWordsV7([...same,...words.filter(x=>x.id!==w.id&&x.zh!==w.zh)]);
+  return seededLocalShuffle(pool.map(x=>x.zh),parseInt(hash(w.id),36)||17).slice(0,3);
+}
+function normalizedAnswerV7(s){return String(s||"").toLowerCase().trim().replace(/[’‘]/g,"'").replace(/[\s_-]+/g,"").replace(/[.,!?;:]/g,"")}
+function processSmartAnswerV7(ok,entered=""){
+  const s=smartSessionV7,w=smartCurrentV7();if(!s||!w||smartFeedbackV7)return;
+  const id=s.queue.shift(),item=s.items[id]||(s.items[id]={hits:0,misses:0});
+  s.stats.answers++;logActivityV7(w,ok,false);markSeen(w);
+  if(ok){
+    s.stats.correct++;item.hits=(item.hits||0)+1;
+    if(item.hits>=2){s.stats.mastered++;scheduleRecallV7(w,true,{log:false,learned:true})}
+    else s.queue.splice(Math.min(3,s.queue.length),0,id);
+  }else{
+    s.stats.wrong++;item.misses=(item.misses||0)+1;item.hits=0;scheduleRecallV7(w,false,{log:false});
+    s.queue.splice(Math.min(2,s.queue.length),0,id);
+  }
+  if(!s.queue.length)s.completed=true;
+  s.updatedAt=Date.now();saveSmartSessionV7();
+  smartFeedbackV7={ok,entered,word:w.word,zh:w.zh,example:w.examples?.[0]||null,finished:s.completed};smartHintV7=false;
+  renderLearnV7();
+}
+function nextSmartV7(){smartFeedbackV7=null;smartHintV7=false;renderLearnV7()}
+function abandonSmartV7(){
+  if(!confirm("結束這次智慧學習？已完成的學習紀錄會保留。"))return;
+  smartSessionV7=null;smartFeedbackV7=null;saveSmartSessionV7();show("home");
+}
+function repeatSmartV7(){
+  const list=(smartSessionV7?.originalIds||[]).map(id=>words.find(w=>w.id===id)).filter(Boolean);
+  startSmartLearnV7(list,smartSessionV7?.label||"智慧學習");
+}
+function renderLearnV7(){
+  const el=document.getElementById("screen-learn");if(!el)return;
+  const s=smartSessionV7;
+  if(!s){el.innerHTML=`<div class="card center"><h2>沒有進行中的智慧學習</h2><button class="btn primary" data-v7-action="smart-global">開始一輪</button></div>`;return}
+  const total=s.originalIds?.length||0,mastered=s.stats?.mastered||0,pct=total?Math.round(mastered/total*100):0;
+  if(s.completed&&!smartFeedbackV7){
+    const sec=Math.max(1,Math.round((Date.now()-s.startedAt)/1000)),acc=s.stats.answers?Math.round(s.stats.correct/s.stats.answers*100):0;
+    el.innerHTML=`<div class="smart-complete card center"><div class="complete-burst">🏁</div><div class="small">${esc(s.label||"智慧學習")}</div><h2>本輪完成</h2><p class="muted">每張卡都完成兩次成功回想。</p><div class="stats"><div class="stat"><b>${total}</b><span>完成單字</span></div><div class="stat"><b>${acc}%</b><span>正確率</span></div><div class="stat"><b>${Math.ceil(sec/60)}</b><span>分鐘</span></div></div><button class="btn primary block" data-v7-action="smart-repeat">再練這一組</button><div class="spacer8"></div><button class="btn block" data-v7-action="smart-finish">回首頁</button></div>`;
+    return;
+  }
+  const w=smartCurrentV7();
+  if(!w&&s.completed){nextSmartV7();return}
+  if(!w){el.innerHTML=`<div class="card center"><h2>找不到本輪單字</h2><button class="btn" data-v7-action="smart-abandon">結束本輪</button></div>`;return}
+  const item=s.items[w.id]||{hits:0,misses:0},mode=smartModeV7(w,item);
+  const stageDots=`<span class="mastery-dot ${(item.hits||0)>=1?"on":""}"></span><span class="mastery-dot ${(item.hits||0)>=2?"on":""}"></span>`;
+  let body="";
+  if(smartFeedbackV7){
+    const f=smartFeedbackV7;
+    body=`<div class="smart-feedback ${f.ok?"good":"bad"}"><div class="feedback-icon">${f.ok?"✓":"×"}</div><div><div class="small">${f.ok?"答對了":"再記一次"}</div><h2>${esc(f.word)}</h2><div class="bigzh smart-zh">${esc(f.zh)}</div>${!f.ok&&f.entered?`<div class="small">你的答案：${esc(f.entered)}</div>`:""}${f.example?`<div class="example"><b>${esc(f.example.english)}</b><br><span class="muted">${esc(f.example.chinese)}</span></div>`:""}<button class="btn primary block" data-v7-action="smart-next">${f.finished?"查看本輪成果":"下一題"}</button></div></div>`;
+  }else if(mode==="choice"){
+    const options=seededLocalShuffle([w.zh,...smartDistractorsV7(w)],(s.stats.answers||0)+parseInt(hash(w.id),36));
+    body=`<div class="smart-question"><div class="question-type">辨義 · Recognition</div><button class="voice-word" data-action="speak" data-word="${attr(w.word)}">🔊 ${esc(w.word)}</button><div class="small">選出最準確的中文意思</div><div class="smart-options">${options.map((v,i)=>`<button class="option" data-v7-action="smart-choice" data-value="${attr(v)}"><span>${i+1}</span>${esc(v)}</button>`).join("")}</div></div>`;
+  }else{
+    const hint=smartHintV7?`${esc(w.word.slice(0,Math.min(2,w.word.length)))}${" ·".repeat(Math.max(1,w.word.length-2))}`:"";
+    body=`<div class="smart-question"><div class="question-type">主動回想 · Active recall</div><div class="bigzh smart-prompt">${esc(w.zh)}</div><div class="small">請輸入英文單字</div>${hint?`<div class="recall-hint">提示：${hint}（${w.word.length} letters）</div>`:""}<form id="smartWriteForm" class="recall-form"><input id="smartWriteInput" class="recall-input" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="Type the word…"><button class="btn primary" type="submit">確認</button></form><button class="btn subtle" data-v7-action="smart-hint">${smartHintV7?"已顯示提示":"需要提示"}</button></div>`;
+  }
+  el.innerHTML=`<div class="smart-top"><button class="btn" data-v7-action="smart-abandon">‹ 結束</button><div class="grow"><div class="row"><span class="small">${esc(s.label||"智慧學習")}</span><span class="small">剩 ${s.queue.length} / ${total}</span></div><div class="smart-progress"><i style="width:${pct}%"></i></div></div></div><div class="smart-mastery-row"><span>這張熟練度</span>${stageDots}<span class="grow"></span><span>本輪 ${mastered}/${total}</span></div>${body}`;
+  if(!smartFeedbackV7&&mode==="write")setTimeout(()=>document.getElementById("smartWriteInput")?.focus(),50);
+}
+
+function startWriteV7(list=filteredDeckWords()){
+  if(!list.length){toast("這個篩選沒有單字");return}
+  writeStateV7={list:[...list],i:0,correct:0,answered:false,answer:"",startedAt:Date.now()};show("write");
+}
+function renderWriteV7(){
+  const el=document.getElementById("screen-write");if(!el)return;const q=writeStateV7;
+  if(!q){el.innerHTML='<div class="card center"><h2>尚未開始輸入練習</h2></div>';return}
+  if(q.i>=q.list.length){const acc=q.list.length?Math.round(q.correct/q.list.length*100):0;el.innerHTML=`<div class="card center"><div class="complete-burst">⌨️</div><h2>輸入練習完成</h2><p class="muted">${q.correct} / ${q.list.length} · ${acc}%</p><button class="btn primary block" data-v7-action="write-restart">再練一次</button><div class="spacer8"></div><button class="btn block" data-action="back-deck">回單字夾</button></div>`;return}
+  const w=q.list[q.i],ex=w.examples?.[0];
+  el.innerHTML=`<div class="row"><button class="btn" data-action="back-deck">‹ Part ${String(currentDeck).padStart(2,"0")}</button><div class="small">${q.i+1} / ${q.list.length} · ${q.correct} 正確</div></div><div class="card recall-card"><div class="question-type">中文 → 英文 · Written recall</div><div class="bigzh smart-prompt">${esc(w.zh)}</div>${ex?.chinese?`<div class="example muted">${esc(ex.chinese)}</div>`:""}${q.answered?`<div class="smart-feedback ${normalizedAnswerV7(q.answer)===normalizedAnswerV7(w.word)?"good":"bad"}"><div><div class="small">正解</div><h2>${esc(w.word)}</h2><button class="btn" data-action="speak" data-word="${attr(w.word)}">🔊 發音</button></div></div><button class="btn primary block" data-v7-action="write-next">下一題</button>`:`<form id="writeRecallForm" class="recall-form"><input id="writeRecallInput" class="recall-input" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="輸入英文…"><button class="btn primary" type="submit">確認</button></form><button class="btn subtle" data-v7-action="write-reveal">不知道，顯示答案</button>`}</div>`;
+  if(!q.answered)setTimeout(()=>document.getElementById("writeRecallInput")?.focus(),50);
+}
+function answerWriteV7(value,forcedWrong=false){
+  const q=writeStateV7;if(!q||q.answered)return;const w=q.list[q.i],ok=!forcedWrong&&normalizedAnswerV7(value)===normalizedAnswerV7(w.word);q.answer=value||"";q.answered=true;if(ok)q.correct++;quizResult(w,ok);renderWriteV7();
+}
+
+function show(name){
+  currentScreen=name;document.querySelectorAll(".screen").forEach(x=>x.classList.remove("active"));
+  const s=document.getElementById("screen-"+name);if(s)s.classList.add("active");
+  document.querySelectorAll("#nav button").forEach(b=>b.classList.toggle("active",b.dataset.nav===name));
+  const titles={home:"Today",decks:"單字夾",review:"智慧複習",search:"搜尋",settings:"設定",deck:`Part ${String(currentDeck).padStart(2,"0")}`,flash:"翻卡牌",learn:"智慧學習",write:"輸入回想",match:"配對遊戲",quiz:"四選一",cloze:"例句挖空",stats:"學習統計"};
+  document.getElementById("headerTitle").textContent=titles[name]||"TOEIC 900";render(name);window.scrollTo(0,0);
+}
+function render(name){
+  if(name==="home")renderHome();if(name==="decks")renderDecks();if(name==="review")renderReview();if(name==="search")renderSearch();if(name==="settings")renderSettings();if(name==="deck")renderDeck();if(name==="flash")renderFlash();if(name==="learn")renderLearnV7();if(name==="write")renderWriteV7();if(name==="match")renderMatch();if(name==="quiz")renderQuiz();if(name==="cloze")renderCloze();if(name==="stats")renderStats();
+}
+function renderHome(){
+  const p=todayPlanV7(),s=p.s,nextDeck=recommendedDeckV7(),hasResume=smartSessionUsableV7();
+  document.getElementById("screen-home").innerHTML=`
+  <div class="card study-hero">
+    <div class="study-hero-copy"><div class="eyebrow">TOEIC 825 → 900 · v${APP_VERSION}</div><h2>${hasResume?"把這輪學完":"今天，先完成最值得學的字"}</h2><p>系統先排到期、弱點，再補新字；同一字會從辨義推進到主動輸入。</p></div>
+    <div class="daily-ring" style="--p:${p.pct*3.6}deg"><div><b>${p.done}</b><span>/ ${p.goal}</span></div></div>
+    <div class="hero-actions"><button class="btn primary big-action" data-v7-action="${hasResume?"smart-resume":"smart-global"}">${hasResume?"▶ 繼續智慧學習":"▶ 開始智慧學習"}</button><button class="btn" data-action="open-deck" data-deck="${nextDeck}">Part ${String(nextDeck).padStart(2,"0")}</button></div>
+  </div>
+  <div class="plan-grid">
+    <button class="metric-card" data-v7-action="smart-review" data-kind="due"><span>今天到期</span><b>${s.due}</b><small>優先複習</small></button>
+    <button class="metric-card" data-v7-action="smart-review" data-kind="weak"><span>弱點單字</span><b>${s.weak}</b><small>需要再回想</small></button>
+    <div class="metric-card"><span>尚未學過</span><b>${s.unseen}</b><small>依 Part 漸進</small></div>
+    <div class="metric-card"><span>連續學習</span><b>${p.streak}</b><small>days</small></div>
+  </div>
+  <div class="card"><div class="section-head"><div><h3>高效率學習路徑</h3><div class="small">辨義 → 主動回想 → 間隔複習</div></div><span class="pill good">Master ${s.mastered}</span></div><div class="learning-path"><div><b>1</b><span>智慧學習</span><small>弱點與到期優先</small></div><div><b>2</b><span>輸入回想</span><small>從中文叫回英文</small></div><div><b>3</b><span>情境鞏固</span><small>例句挖空與測驗</small></div></div></div>
+  <div class="card"><div class="section-head"><div><h3>快速練習</h3><div class="small">所有原有模式都保留</div></div></div><div class="mode-grid home-modes"><button class="mode-btn primary-mode" data-v7-action="smart-global"><b>⚡</b><span>智慧學習</span><small>${settings.smartSize} 字一輪</small></button><button class="mode-btn" data-action="open-deck" data-deck="${nextDeck}"><b>🃏</b><span>翻卡牌</span><small>記住進度</small></button><button class="mode-btn" data-v7-action="write-global"><b>⌨</b><span>輸入回想</span><small>主動產出</small></button><button class="mode-btn" data-action="quick-review"><b>↻</b><span>到期翻卡</span><small>${s.due} 待複習</small></button></div></div>
+  <div class="card compact-card"><div class="row"><div><b>整體掌握</b><div class="small">已看 ${s.seen} / ${words.length} · 熟練 ${s.mastered}</div></div><div class="master-number">${Math.round(s.mastered/Math.max(1,words.length)*100)}%</div></div><div class="progress"><div style="width:${Math.round(s.mastered/Math.max(1,words.length)*100)}%"></div></div><div class="data-status">${statusHTML()}</div></div>`;
+}
+function renderDecks(){
+  let html=`<div class="card"><div class="section-head"><div><h2 style="margin:0">24 個固定單字夾</h2><div class="small">每 Part 50 字 · 順序固定 · Master 1200 不變</div></div>${fullData?`<span class="pill good">${words.length.toLocaleString()} 字</span>`:'<span class="pill warn">離線 50 字</span>'}</div></div><div class="deckgrid">`;
+  for(let i=1;i<=deckCount();i++){const st=deckStats(i);html+=`<button class="deckcard v7-deck" data-action="open-deck" data-deck="${i}"><div class="row"><div class="part">Part ${String(i).padStart(2,"0")}</div>${st.due?`<span class="due-badge">${st.due} due</span>`:""}</div><div class="meta">熟練 ${st.mastered}/${st.total} · 已看 ${st.seen}${st.flashRemaining?` · 翻卡剩 ${st.flashRemaining}`:""}</div><div class="mini"><i style="width:${st.pct}%"></i></div></button>`}
+  html+=`</div>`;document.getElementById("screen-decks").innerHTML=html;
+}
+function renderDeck(){
+  const dw=deckWords(currentDeck),st=deckStats(currentDeck),filtered=filteredDeckWords(),fs=flashSessionForDeckV7(currentDeck);
+  document.getElementById("screen-deck").innerHTML=`
+  <div class="card part-hero"><div class="row"><div><div class="small">單字夾</div><h2>Part ${String(currentDeck).padStart(2,"0")}</h2><div class="small">熟練 ${st.mastered}/${st.total} · 已看 ${st.seen} · 到期 ${st.due}</div></div><button class="btn" data-action="back-decks">全部 Part</button></div><div class="dual-progress"><i style="width:${st.seenPct}%"></i><b style="width:${st.pct}%"></b></div><div class="small progress-legend"><span>淺色：已看 ${st.seenPct}%</span><span>深色：熟練 ${st.pct}%</span></div></div>
+  ${(()=>{const tc=tierCounts(dw);const cats=[...new Set(dw.map(w=>w.category).filter(Boolean))];return `<div class="card filter-card"><div class="small">難度</div><div class="chip-row"><button class="chip ${activeTierFilter==="all"?"active":""}" data-action="tier-filter" data-tier="all">全部 ${dw.length}</button><button class="chip ${activeTierFilter==="825→900 核心缺口"?"active":""}" data-action="tier-filter" data-tier="825→900 核心缺口">核心 ${tc["825→900 核心缺口"]}</button><button class="chip ${activeTierFilter==="900+ 拉分字"?"active":""}" data-action="tier-filter" data-tier="900+ 拉分字">900+ ${tc["900+ 拉分字"]}</button><button class="chip ${activeTierFilter==="高價值橋接"?"active":""}" data-action="tier-filter" data-tier="高價值橋接">橋接 ${tc["高價值橋接"]}</button></div><div class="small chip-label">主題</div><div class="chip-row"><button class="chip ${activeCategoryFilter==="all"?"active":""}" data-action="category-filter" data-category="all">全部</button>${cats.map(c=>`<button class="chip ${activeCategoryFilter===c?"active":""}" data-action="category-filter" data-category="${attr(c)}">${esc(c)}</button>`).join("")}</div><div class="small" style="margin-top:8px">目前篩選 ${filtered.length} / ${dw.length} 字</div></div>`})()}
+  <div class="mode-grid deck-modes"><button class="mode-btn primary-mode" data-v7-action="smart-deck"><b>⚡</b><span>智慧學習</span><small>自動調整難度</small></button><button class="mode-btn" data-action="start-flash-filtered"><b>🃏</b><span>翻卡牌</span><small>${fs&&!fs.completed?`續上次 · 剩 ${(fs.remainingIds||[]).length}`:"學會即消除"}</small></button><button class="mode-btn" data-v7-action="write-deck"><b>⌨</b><span>輸入回想</span><small>中文 → 英文</small></button><button class="mode-btn" data-action="start-quiz-filtered"><b>✓</b><span>四選一</span><small>雙向辨義</small></button><button class="mode-btn" data-action="start-cloze-filtered"><b>▤</b><span>例句挖空</span><small>情境判斷</small></button><button class="mode-btn" data-action="start-match-filtered"><b>◫</b><span>配對遊戲</span><small>快速辨識</small></button></div>
+  <div class="card" style="margin-top:14px"><div class="section-head"><h3>這組單字</h3><span class="small">點單字看完整資訊</span></div>${filtered.map(w=>wordRow(w)).join("")||'<p class="muted">這個篩選沒有單字。</p>'}</div>`;
+}
+function renderReview(){
+  const due=[],weak=[],fav=[],leech=[];words.forEach(w=>{const p=progress[w.id];if(!p)return;if(p.due&&p.due<=now())due.push(w);if(isWeakV7(p))weak.push(w);if(p.fav)fav.push(w);if(isLeechV7(p))leech.push(w)});
+  const forecast=[0,0,0,0,0,0,0];words.forEach(w=>{const d=progress[w.id]?.due;if(!d||d<=now())return;const ix=Math.floor((d-now())/86400000);if(ix>=0&&ix<7)forecast[ix]++});
+  document.getElementById("screen-review").innerHTML=`<div class="card review-hero"><div><div class="small">Spaced review</div><h2>先複習快忘的，不要平均重看全部</h2><p class="muted">到期、弱點與高錯誤字會被優先拉回。</p></div><button class="btn primary big-action" data-v7-action="smart-review" data-kind="due" ${due.length?"":"disabled"}>開始今日複習</button></div><div class="plan-grid"><div class="metric-card"><span>到期</span><b>${due.length}</b><small>現在該複習</small></div><div class="metric-card"><span>弱點</span><b>${weak.length}</b><small>錯多於對</small></div><div class="metric-card"><span>難纏字</span><b>${leech.length}</b><small>反覆失誤</small></div><div class="metric-card"><span>收藏</span><b>${fav.length}</b><small>自選重點</small></div></div><div class="card"><div class="section-head"><h3>未來 7 天到期量</h3><span class="small">今天到期另計</span></div><div class="forecast-bars">${forecast.map((n,i)=>`<div><b style="height:${Math.max(4,Math.min(100,n*8))}%"></b><span>${i===0?"明":"+"+(i+1)}</span><small>${n}</small></div>`).join("")}</div></div><div class="card"><h3>快速建立複習組</h3><div class="review-actions"><button class="btn primary" data-v7-action="smart-review" data-kind="weak" ${weak.length?"":"disabled"}>⚡ 智慧弱點練習</button><button class="btn" data-action="review-list" data-kind="due" ${due.length?"":"disabled"}>🃏 到期翻卡</button><button class="btn" data-action="review-list" data-kind="fav" ${fav.length?"":"disabled"}>★ 收藏翻卡</button><button class="btn" data-v7-action="smart-review" data-kind="leech" ${leech.length?"":"disabled"}>修復難纏字</button></div></div><div class="card"><div class="section-head"><h3>目前最需要處理</h3><span class="small">最多顯示 20 字</span></div>${uniqueWordsV7([...due,...weak,...leech]).slice(0,20).map(wordRow).join("")||'<p class="muted">目前沒有明顯弱點，繼續照排程學即可。</p>'}</div>`;
+}
+function reviewList(kind){
+  const arr=words.filter(w=>{const p=progress[w.id];if(!p)return false;if(kind==="due")return p.due&&p.due<=now();if(kind==="weak")return isWeakV7(p);if(kind==="fav")return p.fav;if(kind==="leech")return isLeechV7(p);return false});startFlash(arr);
+}
+function renderSearch(){
+  const cats=[...new Set(words.map(w=>w.category).filter(Boolean))];
+  document.getElementById("screen-search").innerHTML=`<div class="card search-hero"><h2>搜尋整個 Master 1200</h2><input id="searchInput" class="searchbox" placeholder="英文、中文、搭配、例句、TOEIC 重點…" autocomplete="off"><div class="row wrap search-filters"><select id="searchTierSel" class="btn"><option value="all">全部難度</option>${TIERS.map(t=>`<option value="${attr(t)}">${esc(t)}</option>`).join("")}</select><select id="searchCatSel" class="btn"><option value="all">全部主題</option>${cats.map(c=>`<option value="${attr(c)}">${esc(c)}</option>`).join("")}</select></div></div><div class="card" id="searchResults"><p class="muted">可搜尋 ${words.length.toLocaleString()} 個詞條。</p></div>`;
+  const run=()=>doSearch(document.getElementById("searchInput")?.value||"");
+  setTimeout(()=>{document.getElementById("searchInput")?.addEventListener("input",run);document.getElementById("searchTierSel")?.addEventListener("change",run);document.getElementById("searchCatSel")?.addEventListener("change",run)},0);
+}
+function doSearch(q){
+  const el=document.getElementById("searchResults");if(!el)return;q=q.trim().toLowerCase();const tier=document.getElementById("searchTierSel")?.value||"all",cat=document.getElementById("searchCatSel")?.value||"all";
+  let a=words.filter(w=>{if(tier!=="all"&&w.tier!==tier)return false;if(cat!=="all"&&w.category!==cat)return false;if(!q)return true;const hay=[w.word,w.zh,w.collocation,...(w.forms||[]),...(w.tips||[]),...(w.examples||[]).flatMap(e=>[e.english,e.chinese])].join(" ").toLowerCase();return hay.includes(q)}).slice(0,100);
+  el.innerHTML=`<div class="section-head"><h3>${a.length}${a.length===100?"+":""} 筆結果</h3><span class="small">也搜尋例句與考點</span></div>${a.map(wordRow).join("")||'<p class="muted">找不到結果。</p>'}`;
+}
+function renderSettings(){
+  document.getElementById("screen-settings").innerHTML=`<div class="card"><div class="section-head"><div><div class="small">TOEIC 900</div><h2>設定</h2></div><span class="pill good">v${APP_VERSION}</span></div><div class="settings-group"><h3>學習節奏</h3><div class="listrow"><div class="row"><div><b>每日目標</b><div class="small">首頁以「今天碰過的不同單字」計算</div></div><select id="dailyGoalSel" class="btn"><option value="10">10 字</option><option value="20">20 字</option><option value="30">30 字</option><option value="50">50 字</option></select></div></div><div class="listrow"><div class="row"><div><b>智慧學習每輪</b><div class="small">到期 → 弱點 → 新字 → 最久未碰</div></div><select id="smartSizeSel" class="btn"><option value="10">10 字</option><option value="20">20 字</option><option value="30">30 字</option><option value="50">50 字</option></select></div></div></div><div class="settings-group"><h3>翻卡與語音</h3><div class="listrow"><div class="row"><div><b>翻卡方向</b><div class="small">英文→中文／中文→英文／隨機</div></div><select id="dirSel" class="btn"><option value="en-zh">英 → 中</option><option value="zh-en">中 → 英</option><option value="random">隨機</option></select></div></div><div class="listrow"><div class="row"><div><b>自動發音</b><div class="small">翻到英文正面時自動朗讀</div></div><input id="autoSpeak" type="checkbox" ${settings.autoSpeak?"checked":""}></div></div><div class="listrow"><div class="row"><div><b>英文口音</b><div class="small">美式 en-US／英式 en-GB</div></div><select id="speechAccentSel" class="btn"><option value="us">🇺🇸 美式 English (US)</option><option value="gb">🇬🇧 英式 English (UK)</option></select></div><div style="margin-top:8px"><button class="btn" data-action="test-voice">🔊 試聽目前口音</button></div></div><div class="listrow"><div class="row"><div><b>語音速度</b><div class="small">單字與例句共用</div></div><select id="speechRateSel" class="btn"><option value=".75">0.75×</option><option value=".88">0.88×</option><option value="1">1.00×</option><option value="1.1">1.10×</option></select></div></div></div></div><div class="card"><h3>字庫與 App</h3><div class="data-status">${statusHTML()}</div><div class="notice" style="margin-top:10px"><b>固定 Master 1200：</b>單字名單與 Part 排列不因本次大更新改變。</div><div class="spacer12"></div><button class="btn block" data-action="import-dataset">從手機匯入原始資料集 JSON</button>${fullData?'<div class="spacer8"></div><button class="btn bad block" data-action="clear-data">清除完整字庫快取，回到 50 字</button>':""}</div><div class="card"><h3>學習紀錄</h3><div class="grid2"><button class="btn" data-action="export-progress">匯出全部進度</button><button class="btn" data-action="import-progress">匯入進度</button></div><div class="spacer8"></div><button class="btn bad block" data-action="reset-progress">清除全部學習紀錄</button></div><div class="card"><h3>學習邏輯</h3><p class="small">智慧學習先用辨義確認基本連結，再要求中文→英文主動回想；答錯會快速重現，答對並完成本輪後才拉長下次複習間隔。原有翻卡、四選一、配對、例句挖空功能全部保留。</p></div><div class="card"><h3>資料來源</h3><p class="small">字庫來源：kknono668/toeic-vocab-tw（CC BY-SA 4.0）。固定 TOEIC 825→900 Master 1200 白名單。本工具非 ETS 官方產品。</p></div>`;
+  setTimeout(()=>{const d=document.getElementById("dirSel");if(d){d.value=settings.flashDirection;d.onchange=e=>{settings.flashDirection=e.target.value;saveSettings()}}const a=document.getElementById("autoSpeak");if(a)a.onchange=e=>{settings.autoSpeak=e.target.checked;saveSettings()};const sa=document.getElementById("speechAccentSel");if(sa){sa.value=settings.speechAccent==="gb"?"gb":"us";sa.onchange=e=>{settings.speechAccent=e.target.value==="gb"?"gb":"us";saveSettings();updateAccentButton();toast(settings.speechAccent==="gb"?"已切換英式口音":"已切換美式口音")}}const sr=document.getElementById("speechRateSel");if(sr){sr.value=String(settings.speechRate??.88);sr.onchange=e=>{settings.speechRate=Number(e.target.value)||.88;saveSettings()}}const dg=document.getElementById("dailyGoalSel");if(dg){dg.value=String(settings.dailyGoal||20);dg.onchange=e=>{settings.dailyGoal=Number(e.target.value)||20;saveSettings()}}const ss=document.getElementById("smartSizeSel");if(ss){ss.value=String(settings.smartSize||20);ss.onchange=e=>{settings.smartSize=Number(e.target.value)||20;saveSettings()}}},0);
+}
+function renderStats(){
+  const s=globalStats(),days=last7DaysV7(),max=Math.max(1,...days.map(x=>x.count));
+  const partWeak=[];for(let i=1;i<=deckCount();i++){const dw=deckWords(i);partWeak.push({i,weak:dw.filter(w=>isWeakV7(progress[w.id])).length,mastered:dw.filter(w=>(progress[w.id]?.level||0)>=4).length,total:dw.length})}partWeak.sort((a,b)=>b.weak-a.weak||a.mastered-b.mastered);
+  document.getElementById("screen-stats").innerHTML=`<div class="card stats-hero"><div><div class="small">Learning health</div><h2>${s.mastered} 個已熟練</h2><div class="small">整體正確率 ${s.accuracy}% · 到期 ${s.due} · 弱點 ${s.weak}</div></div><div class="streak-pill">🔥 ${activityStreakV7()} days</div></div><div class="card"><div class="section-head"><h3>近 7 天</h3><span class="small">不同單字數</span></div><div class="week-chart">${days.map(x=>`<div><b style="height:${Math.max(4,Math.round(x.count/max*100))}%"></b><span>${x.label}</span><small>${x.count}</small></div>`).join("")}</div></div><div class="plan-grid"><div class="metric-card"><span>已看</span><b>${s.seen}</b><small>${words.length} 中</small></div><div class="metric-card"><span>熟練</span><b>${s.mastered}</b><small>Lv.4+</small></div><div class="metric-card"><span>弱點</span><b>${s.weak}</b><small>優先處理</small></div><div class="metric-card"><span>難纏字</span><b>${s.leech}</b><small>多次失誤</small></div></div><div class="card"><div class="section-head"><h3>最需要加強的 Part</h3><span class="small">依弱點數排序</span></div>${partWeak.slice(0,6).map(x=>`<button class="part-health" data-action="open-deck" data-deck="${x.i}"><span>Part ${String(x.i).padStart(2,"0")}</span><div class="progress grow"><div style="width:${Math.round(x.mastered/Math.max(1,x.total)*100)}%"></div></div><small>${x.weak} 弱點 · ${x.mastered}/${x.total}</small></button>`).join("")}</div>`;
+}
+function openDetail(id){
+  const w=words.find(x=>x.id===id);if(!w)return;const p=pstate(w.id),ex=w.examples||[],acc=(p.correct+p.wrong)?Math.round(p.correct/(p.correct+p.wrong)*100):0;
+  document.getElementById("modalTitle").innerHTML=`<div class="bigword" style="font-size:29px">${esc(w.word)}</div><div class="bigzh" style="font-size:18px;margin:4px 0">${esc(w.zh)}</div>`;
+  document.getElementById("modalBody").innerHTML=`<div class="row wrap"><div class="badges"><span class="badge">${esc(w.pos||"")}</span><span class="badge">${esc(w.category||"")}</span><span class="badge">${esc(w.score||"")}</span><span class="badge">${esc(w.tier||"")}</span></div><div><button class="btn" data-action="speak" data-word="${attr(w.word)}">🔊 發音</button> <button class="btn" data-action="toggle-fav" data-id="${w.id}">${p.fav?"★ 已收藏":"☆ 收藏"}</button></div></div>${w.collocation?`<div class="example"><b>常見搭配</b><br>${esc(w.collocation)}</div>`:""}${ex.map(e=>`<div class="example"><div class="row" style="align-items:flex-start"><b class="grow">${esc(e.english)}</b><button class="speak-mini" data-action="speak-text" data-text="${attr(e.english)}">🔊</button></div><span class="muted">${esc(e.chinese)}</span></div>`).join("")}${w.tips?.length?`<div class="example"><b>TOEIC 重點</b><ul style="padding-left:20px;margin-bottom:0">${w.tips.map(t=>`<li style="margin:7px 0">${esc(t)}</li>`).join("")}</ul></div>`:""}<div class="detail-health"><div><span>熟練度</span><b>Lv.${p.level}</b></div><div><span>正確率</span><b>${acc}%</b></div><div><span>下次複習</span><b>${dueTextV7(p)}</b></div></div>`;
+  document.getElementById("modal").classList.remove("closing","hidden");
+}
+function exportProgress(){
+  const blob=new Blob([JSON.stringify({version:4,progress,settings,flashSessions,activityV7,smartSessionV7,exportedAt:new Date().toISOString()},null,2)],{type:"application/json"});
+  const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="toeic900-progress-v7.json";a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+}
+async function importProgressFile(file){try{const x=JSON.parse(await file.text());if(!x.progress)throw 0;progress=x.progress;if(x.settings)settings=Object.assign(settings,x.settings);if(x.flashSessions&&typeof x.flashSessions==="object")flashSessions=x.flashSessions;if(x.activityV7&&typeof x.activityV7==="object")activityV7=x.activityV7;if(x.smartSessionV7&&typeof x.smartSessionV7==="object")smartSessionV7=x.smartSessionV7;saveProgress();saveSettings();saveFlashSessions();saveActivityV7();saveSmartSessionV7();applyTheme();updateAccentButton();toast("進度匯入完成");show("home")}catch(e){toast("進度檔格式不正確")}}
+function resetProgress(){if(confirm("確定要清除全部學習紀錄？翻卡、智慧學習、統計與排程都會清除，且無法復原。")){progress={};flashSessions={};activityV7={days:{}};smartSessionV7=null;saveProgress();saveFlashSessions();saveActivityV7();saveSmartSessionV7();toast("全部學習紀錄已清除");show("home")}}
+
+// V7 actions use their own attribute so they do not interfere with the legacy action router.
+document.addEventListener("click",e=>{
+  const b=e.target.closest("[data-v7-action]");if(!b)return;const a=b.dataset.v7Action;
+  if(a==="smart-global")startSmartLearnV7(words,"全字庫智慧學習");
+  else if(a==="smart-resume")resumeSmartLearnV7();
+  else if(a==="smart-deck")startSmartLearnV7(filteredDeckWords(),`Part ${String(currentDeck).padStart(2,"0")} 智慧學習`);
+  else if(a==="smart-review"){
+    const kind=b.dataset.kind;let arr=words.filter(w=>{const p=progress[w.id];if(!p)return false;if(kind==="due")return p.due&&p.due<=now();if(kind==="weak")return isWeakV7(p);if(kind==="leech")return isLeechV7(p);return false});
+    if(!arr.length){toast("目前沒有這類單字");return}startSmartLearnV7(arr,kind==="due"?"到期智慧複習":kind==="leech"?"難纏字修復":"弱點智慧複習");
+  }
+  else if(a==="smart-choice")processSmartAnswerV7(b.dataset.value===smartCurrentV7()?.zh,b.dataset.value);
+  else if(a==="smart-next")nextSmartV7();
+  else if(a==="smart-hint"){smartHintV7=true;renderLearnV7()}
+  else if(a==="smart-abandon")abandonSmartV7();
+  else if(a==="smart-repeat")repeatSmartV7();
+  else if(a==="smart-finish"){smartSessionV7=null;smartFeedbackV7=null;saveSmartSessionV7();show("home")}
+  else if(a==="write-deck")startWriteV7(filteredDeckWords());
+  else if(a==="write-global")startWriteV7(smartCandidatesV7(words,Number(settings.smartSize)||20));
+  else if(a==="write-reveal")answerWriteV7("",true);
+  else if(a==="write-next"){if(writeStateV7){writeStateV7.i++;writeStateV7.answered=false;writeStateV7.answer="";renderWriteV7()}}
+  else if(a==="write-restart"){if(writeStateV7){writeStateV7.i=0;writeStateV7.correct=0;writeStateV7.answered=false;writeStateV7.answer="";renderWriteV7()}}
+});
+document.addEventListener("submit",e=>{
+  if(e.target.id==="smartWriteForm"){e.preventDefault();const w=smartCurrentV7(),v=document.getElementById("smartWriteInput")?.value||"";if(w)processSmartAnswerV7(normalizedAnswerV7(v)===normalizedAnswerV7(w.word),v)}
+  else if(e.target.id==="writeRecallForm"){e.preventDefault();answerWriteV7(document.getElementById("writeRecallInput")?.value||"")}
+});
+document.addEventListener("keydown",e=>{
+  if(currentScreen==="learn"&&!smartFeedbackV7&&smartCurrentV7()&&smartModeV7(smartCurrentV7(),smartSessionV7.items[smartCurrentV7().id])==="choice"&&/^[1-4]$/.test(e.key)){
+    const opts=[...document.querySelectorAll('#screen-learn [data-v7-action="smart-choice"]')];const b=opts[Number(e.key)-1];if(b){e.preventDefault();b.click()}
+  }
+});
 
 (function init(){
   // Strict v3 migration: delete only the OLD word-cache database.

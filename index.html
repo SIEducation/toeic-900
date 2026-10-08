@@ -4,13 +4,14 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
 <meta name="theme-color" content="#0f172a">
+<meta name="description" content="TOEIC 825→900 Master 1200：智慧學習、間隔複習、翻卡、輸入、測驗與例句練習。">
 <link rel="manifest" href="./manifest.webmanifest">
 <link rel="apple-touch-icon" href="./icon-192.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="TOEIC 900">
-<title>TOEIC 900 Vocabulary</title>
-<link rel="stylesheet" href="./style.css?v=6.1.4">
+<title>TOEIC 900 · Master 1200</title>
+<link rel="stylesheet" href="./style.css?v=7.0.0">
 </head>
 <body>
 <div class="app" id="app">
@@ -31,6 +32,8 @@
     <section id="screen-settings" class="screen"></section>
     <section id="screen-deck" class="screen"></section>
     <section id="screen-flash" class="screen"></section>
+    <section id="screen-learn" class="screen"></section>
+    <section id="screen-write" class="screen"></section>
     <section id="screen-match" class="screen"></section>
     <section id="screen-quiz" class="screen"></section>
     <section id="screen-cloze" class="screen"></section>
@@ -52,10 +55,10 @@
 </div></nav>
 
 <div id="modal" class="modal hidden"><div class="modalcard"><div class="modalhead"><div id="modalTitle"></div><button class="close" id="modalClose">×</button></div><div id="modalBody"></div></div></div>
-<div id="toast" class="toast hidden"></div>
+<div id="toast" class="toast hidden" role="status" aria-live="polite"></div>
 <input type="file" id="importProgress" accept="application/json" hidden>
 <input type="file" id="importDataset" accept=".json,application/json" hidden>
 
-<script src="./app.js?v=6.1.4"></script>
+<script src="./app.js?v=7.0.0"></script>
 </body>
 </html>

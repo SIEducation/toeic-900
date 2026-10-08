@@ -528,6 +528,21 @@ async function importProgressFile(file){try{const x=JSON.parse(await file.text()
 function resetProgress(){if(confirm("確定要清除全部學習紀錄？此動作無法復原。")){progress={};saveProgress();toast("學習紀錄已清除");show("home")}}
 function applyTheme(){document.documentElement.dataset.theme=settings.theme}
 function toggleTheme(){settings.theme=settings.theme==="dark"?"light":"dark";saveSettings();applyTheme()}
+function updateAccentButton(){
+  const b=document.getElementById("accentBtn");
+  if(!b)return;
+  const gb=settings.speechAccent==="gb";
+  b.textContent=gb?"UK":"US";
+  b.title=gb?"目前：英式發音（點擊切換美式）":"目前：美式發音（點擊切換英式）";
+  b.setAttribute("aria-label",b.title);
+}
+function toggleSpeechAccent(){
+  settings.speechAccent=settings.speechAccent==="gb"?"us":"gb";
+  saveSettings();
+  updateAccentButton();
+  if(currentScreen==="settings")renderSettings();
+  toast(settings.speechAccent==="gb"?"已切換為英式發音 🇬🇧":"已切換為美式發音 🇺🇸");
+}
 
 document.addEventListener("click",e=>{
   const b=e.target.closest("[data-action]");if(!b)return;
@@ -582,6 +597,8 @@ document.addEventListener("click",e=>{
 document.querySelectorAll("#nav button").forEach(b=>b.addEventListener("click",()=>show(b.dataset.nav)));
 document.getElementById("statsBtn").onclick=()=>show("stats");
 document.getElementById("themeBtn").onclick=toggleTheme;
+const accentBtn=document.getElementById("accentBtn");
+if(accentBtn)accentBtn.onclick=toggleSpeechAccent;
 document.getElementById("modalClose").onclick=closeModal;
 document.getElementById("modal").addEventListener("click",e=>{if(e.target.id==="modal")closeModal()});
 document.getElementById("importProgress").onchange=e=>{if(e.target.files[0])importProgressFile(e.target.files[0]);e.target.value=""};
@@ -595,6 +612,7 @@ document.getElementById("importDataset").onchange=e=>{if(e.target.files[0])impor
   // Critical for Android content:// pages:
   // render the built-in app FIRST. IndexedDB is optional background enhancement only.
   applyTheme();
+  updateAccentButton();
   renderHome();
   Promise.race([
     idbGet(DATA_KEY),

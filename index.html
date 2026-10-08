@@ -10,13 +10,14 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="TOEIC 900">
 <title>TOEIC 900 Vocabulary</title>
-<link rel="stylesheet" href="./style.css">
+<link rel="stylesheet" href="./style.css?v=6.1.2">
 </head>
 <body>
 <div class="app" id="app">
   <header class="topbar">
     <div><div class="eyebrow">TOEIC 825 → 900</div><h1 id="headerTitle">Vocabulary</h1></div>
     <div class="top-actions">
+      <button class="iconbtn" id="accentBtn" title="切換美式／英式發音" aria-label="切換美式／英式發音">US</button>
       <button class="iconbtn" id="installBtn" title="安裝 App" style="display:none">⇩</button>
       <button class="iconbtn" id="statsBtn" title="統計">◎</button>
       <button class="iconbtn" id="themeBtn" title="深色模式">◐</button>
@@ -55,6 +56,6 @@
 <input type="file" id="importProgress" accept="application/json" hidden>
 <input type="file" id="importDataset" accept=".json,application/json" hidden>
 
-<script src="./app.js"></script>
+<script src="./app.js?v=6.1.2"></script>
 </body>
 </html>

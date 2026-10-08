@@ -51,3 +51,7 @@ Service Worker 會快取 App 外殼；字庫資料仍由 App 的 IndexedDB 保�
 
 ## v5.1
 Icons are stored in the repository root for simpler GitHub web upload.
+
+
+## v5.2
+Desktop header/sidebar branding layout fixed. The sidebar brand no longer overlaps the page header.
